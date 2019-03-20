@@ -14,7 +14,6 @@ class User(AbstractUser):
     image = models.CharField(max_length=200, null=True)
     phone_number = models.CharField(max_length=20, null=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def repr(self):
         return f'{self.first_name} {self.last_name}'
@@ -59,7 +58,8 @@ class Ticket(models.Model):
     """A model class representing a passenger ticket"""
 
     passenger = models.CharField(max_length=50)
-    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    seat = models.OneToOneField(Seat, on_delete=models.CASCADE, primary_key=True,
+    )
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
