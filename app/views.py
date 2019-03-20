@@ -32,3 +32,17 @@ def user_signup(request):
             return Response(payload, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def user_signin(request):
+    data = request.data
+    user = get_object_or_404(User, email=data['email'])
+    if check_password(data['password'], user.password):
+        token = generate_token(user)
+        payload = {
+                    'token': token,
+                    'message': "Successfully logged in",
+                }
+        return Response(payload, status=status.HTTP_200_OK)
+    return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
