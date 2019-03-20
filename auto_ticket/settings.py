@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'auto_ticket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'autoticket',
+        'NAME': 'auto_ticket',
         'USER': 'victor',
         'PASSWORD': 'victor',
         'HOST': '127.0.0.1'
@@ -123,3 +123,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'app.User'
