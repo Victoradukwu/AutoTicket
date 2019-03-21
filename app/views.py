@@ -119,3 +119,42 @@ def payment(request):
     if pay_resp['data']['status'] != 'success':
         return Response({'message': pay_resp.data.display_text}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'message': 'Payment successful'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def book_ticket(request):
+    data = request.data
+    if not data['email']:
+        data['email'] = request.user.email
+    serializer = TicketSerializer(data=data)
+    if serializer.is_valid():
+        seat = serializer.validated_data['seat']
+        payment_data = {
+            "email": data['email'],
+            "amount": str(seat.flight.fare),
+            "pin": data['pin'],
+            "card": {
+                "number": data['number'],
+                "cvv": data['cvv'],
+                "expiry_month": data['expiry_month'],
+                "expiry_year": data['expiry_year']
+            }
+        }
+        pay_resp = make_payment(payment_data)
+
+        if pay_resp['data']['status'] == 'success':
+            serializer.save()
+            update_seat_status(seat, SeatStatus.booked)
+
+            flight_date = datetime.strftime(seat.flight.departure_time, '%Y-%m-%d %H:%M')
+            flight_number = seat.flight.number
+            seat_number = seat.seat_number
+            mail_data = {
+                'email': data['email'],
+                'subject': 'Ticket Booking',
+                'content': f'Ticket successfully booked\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
+            }
+            send_email(mail_data)
+            return Response({'message': 'Ticket successfully booked. Details have been sent by email'}, status=status.HTTP_200_OK)
+        return Response({'message': pay_resp.data.display_text}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

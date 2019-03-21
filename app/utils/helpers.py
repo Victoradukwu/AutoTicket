@@ -4,7 +4,6 @@ from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
 from django.core.mail import send_mail
-import json
 
 
 def generate_token(user):
@@ -42,6 +41,7 @@ def send_email(payload):
         [payload['email']],
         fail_silently=False
     )
+
 
 def update_seat_status(seat, status):
     seat.status=status

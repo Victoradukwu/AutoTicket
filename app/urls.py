@@ -10,5 +10,6 @@ urlpatterns = [
     path('seats/', views.SeatList.as_view(), name='seat_list'),
     path('seats/<int:pk>/', views.SeatDetail.as_view(), name='seat_detail'),
     path('flights/reservation/', views.make_reservation, name='reservation'),
+    path('flights/ticket/', views.book_ticket, name='book_ticket'),
     path('payment/', views.payment, name='payment'),
    ]
