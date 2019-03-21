@@ -4,6 +4,7 @@ from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
 from django.core.mail import send_mail
+import json
 
 
 def generate_token(user):
@@ -29,8 +30,8 @@ def upload_image(image):
 def make_payment(payload):
     test_secret = os.getenv('PAYSTACK_TEST_SECRET_KEY')
     headers = {'Authorization': f'Bearer {test_secret}'}
-    resp = requests.post('https://api.paystack.co/charge', data=payload, headers=headers)
-    return resp
+    resp = requests.post('https://api.paystack.co/charge', json=payload, headers=headers)
+    return resp.json()
 
 
 def send_email(payload):

@@ -100,3 +100,22 @@ def make_reservation(request):
         return Response({'message': 'Reservation successful. Details have been sent by email'}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def payment(request):
+    data = request.data
+    payment_data = {
+        "email": data['email'],
+        "amount": data['amount'],
+        "pin": data['pin'],
+        "card": {
+            "number": data['number'],
+            "cvv": data['cvv'],
+            "expiry_month": data['expiry_month'],
+            "expiry_year":  data['expiry_year']
+        }
+    }
+    pay_resp = make_payment(payment_data)
+    if pay_resp['data']['status'] != 'success':
+        return Response({'message': pay_resp.data.display_text}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'Payment successful'}, status=status.HTTP_200_OK)
