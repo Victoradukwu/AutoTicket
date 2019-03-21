@@ -1,12 +1,14 @@
 """A module of app views"""
+from datetime import datetime
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.base_user import make_password, check_password
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import UserSerializer
-from .models import User
-from .utils.helpers import generate_token, upload_image
+from .serializers import UserSerializer, FlightSerializer, SeatSerializer, TicketSerializer
+from .models import User, Flight, Seat
+from .utils.helpers import generate_token, upload_image, send_mail, make_payment, update_seat_status
+from .utils.enums import SeatStatus, PaymentStatus
 
 
 @api_view(['POST'])
@@ -46,3 +48,46 @@ def user_signin(request):
                 }
         return Response(payload, status=status.HTTP_200_OK)
     return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FlightList(generics.ListCreateAPIView):
+    """A class view for creating a flight or getting a flight list"""
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for single-flight operations: retrieve, delete, update"""
+
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class SeatList(generics.ListCreateAPIView):
+    """A class view for creating a seat object or getting a seat list"""
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+
+class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for single-seat operations: retrieve, delete, update"""
+
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+
+@api_view(['POST'])
+def make_reservation(request):
+    data = request.data
+    if not data['email']:
+        data['email'] = request.user.email
+    serializer = TicketSerializer(data=data)
+    if serializer.is_valid():
+        serializer.validated_data['payment_status'] = PaymentStatus.pending
+        seat = serializer.validated_data['seat']
+        serializer.save()
+        update_seat_status(seat, SeatStatus.booked)
+
+        return Response({'message': 'Reservation successful. Details have been sent by email'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

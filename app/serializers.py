@@ -14,3 +14,31 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
+
+class FlightSerializer(serializers.ModelSerializer):
+    """FlightSerializer class"""
+    seats = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
+
+    class Meta:
+        model = Flight
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'seats')
+
+
+class SeatSerializer(serializers.ModelSerializer):
+    """SeatSerializer class"""
+
+    class Meta:
+        model = Seat
+        fields = ('id', 'status', 'seat_number', 'flight')
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    """TicketSerializer class"""
+    # seat = SeatSerializer()
+
+    class Meta:
+        model = Ticket
+        fields = ('passenger', 'seat')
+
+
+
