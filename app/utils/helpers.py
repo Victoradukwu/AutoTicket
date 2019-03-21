@@ -3,6 +3,7 @@ import os
 from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
+from django.core.mail import send_mail
 
 
 def generate_token(user):
@@ -32,9 +33,14 @@ def make_payment(payload):
     return resp
 
 
-def send_mail(payload):
-    pass
-
+def send_email(payload):
+    send_mail(
+        payload['subject'],
+        payload['content'],
+        'vicads01@gmail.com',
+        [payload['email']],
+        fail_silently=False
+    )
 
 def update_seat_status(seat, status):
     seat.status=status

@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import UserSerializer, FlightSerializer, SeatSerializer, TicketSerializer
 from .models import User, Flight, Seat
-from .utils.helpers import generate_token, upload_image, send_mail, make_payment, update_seat_status
+from .utils.helpers import generate_token, upload_image, send_email, make_payment, update_seat_status
 from .utils.enums import SeatStatus, PaymentStatus
 
 
@@ -85,9 +85,18 @@ def make_reservation(request):
     if serializer.is_valid():
         serializer.validated_data['payment_status'] = PaymentStatus.pending
         seat = serializer.validated_data['seat']
+        flight_date = datetime.strftime(seat.flight.departure_time, '%Y-%m-%d %H:%M')
+        flight_number = seat.flight.number
+        seat_number = seat.seat_number
         serializer.save()
         update_seat_status(seat, SeatStatus.booked)
 
+        mail_data = {
+            'email': data['email'],
+            'subject': 'Ticket Reservation',
+            'content': f'Reservation made\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
+        }
+        send_email(mail_data)
         return Response({'message': 'Reservation successful. Details have been sent by email'}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
