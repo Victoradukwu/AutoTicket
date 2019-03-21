@@ -2,6 +2,7 @@
 import os
 from rest_framework_jwt.settings import api_settings
 import cloudinary
+import requests
 
 
 def generate_token(user):
@@ -22,3 +23,19 @@ def upload_image(image):
 
     response = cloudinary.uploader.upload(image)
     return response['url']
+
+
+def make_payment(payload):
+    test_secret = os.getenv('PAYSTACK_TEST_SECRET_KEY')
+    headers = {'Authorization': f'Bearer {test_secret}'}
+    resp = requests.post('https://api.paystack.co/charge', data=payload, headers=headers)
+    return resp
+
+
+def send_mail(payload):
+    pass
+
+
+def update_seat_status(seat, status):
+    seat.status=status
+    seat.save()

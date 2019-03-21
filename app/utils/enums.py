@@ -17,3 +17,12 @@ class SeatStatus(str, enum.Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
+class PaymentStatus(str, enum.Enum):
+    paid = 'paid'
+    pending = 'pending'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)

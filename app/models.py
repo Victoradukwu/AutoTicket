@@ -57,9 +57,12 @@ class Seat(models.Model):
 class Ticket(models.Model):
     """A model class representing a passenger ticket"""
 
-    passenger = models.CharField(max_length=50)
-    seat = models.OneToOneField(Seat, on_delete=models.CASCADE, primary_key=True,
-    )
+    passenger = models.CharField(max_length=100)
+    seat = models.OneToOneField(Seat, on_delete=models.CASCADE, primary_key=True)
+    payment_status = models.CharField(
+        max_length=10,
+        choices=[(tag, tag.value) for tag in enums.PaymentStatus],
+        default=enums.PaymentStatus.paid)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
