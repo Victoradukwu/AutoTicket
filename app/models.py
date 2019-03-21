@@ -41,6 +41,9 @@ class Flight(models.Model):
 class Seat(models.Model):
     """A model class representing a particular seat on a particular flight"""
 
+    class Meta:
+        unique_together = (('seat_number', 'flight'),)
+
     seat_number = models.CharField(max_length=6)
     status = models.CharField(
         max_length=1,
