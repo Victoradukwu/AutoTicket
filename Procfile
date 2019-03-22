@@ -1,0 +1,1 @@
+web: gunicorn auto_ticket.wsgi
