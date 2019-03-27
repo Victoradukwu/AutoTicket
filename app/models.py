@@ -62,6 +62,7 @@ class Ticket(models.Model):
 
     passenger = models.CharField(max_length=100)
     seat = models.OneToOneField(Seat, on_delete=models.CASCADE, primary_key=True)
+    booked_by = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE)
     payment_status = models.CharField(
         max_length=10,
         choices=[(tag, tag.value) for tag in enums.PaymentStatus],

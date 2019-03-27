@@ -3,12 +3,22 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.base_user import make_password, check_password
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import UserSerializer, FlightSerializer, SeatSerializer, TicketSerializer
-from .models import User, Flight, Seat
-from .utils.helpers import generate_token, upload_image, send_email, make_payment, update_seat_status
+from .models import User, Flight, Seat, Ticket
 from .utils.enums import SeatStatus, PaymentStatus
+from .utils.helpers import(
+    generate_token,
+    upload_image,
+    send_email,
+    make_payment,
+    update_seat_status,
+    IsAdminUserOrReadOnly,
+    IsAdminUserOrOwnerReadOnly,
+    IsAdminUserOrOwnerReadAndUpdateOnly
+)
 
 
 @api_view(['POST'])
@@ -20,7 +30,7 @@ def user_signup(request):
         data['image'] = upload_image(img)
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
-            serializer.validated_data['password'] =  make_password(data['password'])
+            serializer.validated_data['password'] = make_password(data['password'])
             serializer.validated_data['username'] = serializer.validated_data['email']
             serializer.save()
 
@@ -49,41 +59,15 @@ def user_signin(request):
         return Response(payload, status=status.HTTP_200_OK)
     return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class FlightList(generics.ListCreateAPIView):
-    """A class view for creating a flight or getting a flight list"""
-    queryset = Flight.objects.all()
-    serializer_class = FlightSerializer
-
-
-class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for single-flight operations: retrieve, delete, update"""
-
-    queryset = Flight.objects.all()
-    serializer_class = FlightSerializer
-
-
-class SeatList(generics.ListCreateAPIView):
-    """A class view for creating a seat object or getting a seat list"""
-    queryset = Seat.objects.all()
-    serializer_class = SeatSerializer
-
-
-class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for single-seat operations: retrieve, delete, update"""
-
-    queryset = Seat.objects.all()
-    serializer_class = SeatSerializer
-
-
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
 def make_reservation(request):
     data = request.data
-    if not data['email']:
-        data['email'] = request.user.email
+
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
         serializer.validated_data['payment_status'] = PaymentStatus.pending
+        serializer.validated_data['booked_by'] = request.user
         seat = serializer.validated_data['seat']
         flight_date = datetime.strftime(seat.flight.departure_time, '%Y-%m-%d %H:%M')
         flight_number = seat.flight.number
@@ -92,9 +76,9 @@ def make_reservation(request):
         update_seat_status(seat, SeatStatus.booked)
 
         mail_data = {
-            'email': data['email'],
+            'email': data.get('email', request.user.email),
             'subject': 'Ticket Reservation',
-            'content': f'Reservation made\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
+            'content': f'Reservation made\nPassenger: {data["passenger"]} \ndate: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
         }
         send_email(mail_data)
         return Response({'message': 'Reservation successful. Details have been sent by email'}, status=status.HTTP_200_OK)
@@ -102,6 +86,7 @@ def make_reservation(request):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
 def payment(request):
     data = request.data
     payment_data = {
@@ -122,15 +107,15 @@ def payment(request):
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
 def book_ticket(request):
     data = request.data
-    if not data['email']:
-        data['email'] = request.user.email
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
+        serializer.validated_data['booked_by'] = request.user
         seat = serializer.validated_data['seat']
         payment_data = {
-            "email": data['email'],
+            'email': data.get('email', request.user.email),
             "amount": str(seat.flight.fare),
             "pin": data['pin'],
             "card": {
@@ -143,6 +128,7 @@ def book_ticket(request):
         pay_resp = make_payment(payment_data)
 
         if pay_resp['data']['status'] == 'success':
+            serializer.validated_data['booked_by'] = request.user
             serializer.save()
             update_seat_status(seat, SeatStatus.booked)
 
@@ -158,3 +144,73 @@ def book_ticket(request):
             return Response({'message': 'Ticket successfully booked. Details have been sent by email'}, status=status.HTTP_200_OK)
         return Response({'message': pay_resp.data.display_text}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FlightList(generics.ListCreateAPIView):
+    """A class view for creating a flight or getting a flight list"""
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for single-flight operations: retrieve, delete, update"""
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
+
+
+class SeatList(generics.ListCreateAPIView):
+    """A class view for creating a seat object or getting a seat list"""
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+
+class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for single-seat operations: retrieve, delete, update"""
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+
+class TicketList(generics.ListAPIView):
+    """A class view for listing all tickets booked for a particular flight"""
+
+    permission_classes = (IsAdminUser,)
+    serializer_class = TicketSerializer
+
+    def get_queryset(self):
+        flight = self.kwargs['flight']
+        return Ticket.objects.filter(seat__flight=flight)
+
+
+class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for ticket operations: retrieve, delete, update"""
+
+    permission_classes = (IsAdminUserOrOwnerReadOnly,)
+    serializer_class = TicketSerializer
+    queryset = Ticket.objects.all()
+
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """A class view for single-user operations: retrieve, delete, update"""
+
+    permission_classes = (IsAdminUserOrOwnerReadAndUpdateOnly,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserList(generics.ListAPIView):
+    """A class view for getting a user list"""
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

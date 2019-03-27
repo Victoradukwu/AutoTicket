@@ -34,11 +34,12 @@ class SeatSerializer(serializers.ModelSerializer):
 
 class TicketSerializer(serializers.ModelSerializer):
     """TicketSerializer class"""
-    # seat = SeatSerializer()
 
     class Meta:
         model = Ticket
-        fields = ('passenger', 'seat')
+        fields = '__all__'
+        read_only_fields = ('booked_by',)
+
 
 
 
