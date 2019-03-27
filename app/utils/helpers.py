@@ -4,6 +4,28 @@ from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
 from django.core.mail import send_mail
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+
+class IsAdminUserOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or request.user.is_staff
+
+
+class IsAdminUserOrOwnerReadOnly(BasePermission):
+    """Admin has full access. Owner has read only"""
+    def has_object_permission(self, request, view, obj):
+        if obj.booked_by == request.user and request.method in SAFE_METHODS:
+            return True
+        return request.user.is_staff
+
+
+class IsAdminUserOrOwnerReadAndUpdateOnly(BasePermission):
+    """Admin has full access. Owner can only read and update"""
+    def has_object_permission(self, request, view, obj):
+        if obj == request.user and request.method in ['PUT', 'PATCH', 'GET']:
+            return True
+        return request.user.is_staff
 
 
 def generate_token(user):
