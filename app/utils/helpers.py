@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
+from celery import shared_task
 from django.core.mail import send_mail
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -58,6 +59,7 @@ def make_payment(payload):
     return resp.json()
 
 
+@shared_task
 def send_email(payload):
     send_mail(
         payload['subject'],
@@ -88,10 +90,10 @@ def send_reminders():
             'subject': 'Travel Reminder',
             'content': f'Please be reminded of your schedulled flight as follows.\nPassenger: {passenger}\nDate & time: {flight_date}\nFlight no.: {flight_number}\nSeat no.: {seat_number}'
         }
-        send_email(mail_data)
+        send_email.delay(mail_data)
 
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_reminders, 'cron', hour=12, minute=00)
+    scheduler.add_job(send_reminders, 'cron', hour=12, minute=0)
     scheduler.start()
