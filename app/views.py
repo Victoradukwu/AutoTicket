@@ -59,6 +59,7 @@ def user_signin(request):
         return Response(payload, status=status.HTTP_200_OK)
     return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def make_reservation(request):

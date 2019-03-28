@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'cloudinary',
-    'app'
+    'app.apps.AppConfig'
 ]
 
 MIDDLEWARE = [
@@ -161,3 +161,4 @@ CACHES = {
     }
 }
 
+SCHEDULER_AUTOSTART = True
