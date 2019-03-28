@@ -1,10 +1,13 @@
 """A module of helper functions and classes"""
 import os
+from datetime import datetime, timedelta
 from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
 from django.core.mail import send_mail
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from apscheduler.schedulers.background import BackgroundScheduler
+from ..models import Ticket
 
 
 class IsAdminUserOrReadOnly(BasePermission):
@@ -68,3 +71,27 @@ def send_email(payload):
 def update_seat_status(seat, status):
     seat.status=status
     seat.save()
+
+
+def send_reminders():
+    """Send reminders to traveller who are travelling the next day"""
+    next_day = (datetime.now() + timedelta(days=1)).date()
+    tickets = Ticket.objects.filter(seat__flight__departure_time__date=next_day)
+    for ticket in tickets:
+        passenger = ticket.passenger
+        flight_date = datetime.strftime(ticket.seat.flight.departure_time, '%Y-%m-%d %H:%M')
+        flight_number = ticket.seat.flight.number
+        seat_number = ticket.seat.seat_number
+        email = ticket.booked_by.email
+        mail_data = {
+            'email': email,
+            'subject': 'Travel Reminder',
+            'content': f'Please be reminded of your schedulled flight as follows.\nPassenger: {passenger}\nDate & time: {flight_date}\nFlight no.: {flight_number}\nSeat no.: {seat_number}'
+        }
+        send_email(mail_data)
+
+
+def start():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(send_reminders, 'cron', hour=12, minute=00)
+    scheduler.start()
