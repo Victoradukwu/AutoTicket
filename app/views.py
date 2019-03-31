@@ -26,6 +26,7 @@ def user_signup(request):
     data = request.data
 
     if data['password'] == data['confirm_password']:
+        data = data.copy()
         img = data['image']
         data['image'] = upload_image(img)
         serializer = UserSerializer(data=data)
@@ -64,7 +65,9 @@ def user_signin(request):
 @permission_classes((IsAuthenticated, ))
 def make_reservation(request):
     data = request.data
-
+    data = data.copy()
+    if not data['email']:
+        data['email'] = request.user.email
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
         serializer.validated_data['payment_status'] = PaymentStatus.pending
