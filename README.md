@@ -1,4 +1,4 @@
-# AutoTocket
+# AutoTicket
 
 ## Introduction
 **AutoTicket** is an application that automates airline ticketing system.
