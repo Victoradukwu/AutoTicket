@@ -1,9 +1,35 @@
 """A module of helper functions and classes"""
 import os
+from datetime import datetime, timedelta
 from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
+from celery import shared_task
 from django.core.mail import send_mail
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+from apscheduler.schedulers.background import BackgroundScheduler
+from ..models import Ticket
+
+
+class IsAdminUserOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or request.user.is_staff
+
+
+class IsAdminUserOrOwnerReadOnly(BasePermission):
+    """Admin has full access. Owner has read only"""
+    def has_object_permission(self, request, view, obj):
+        if obj.booked_by == request.user and request.method in SAFE_METHODS:
+            return True
+        return request.user.is_staff
+
+
+class IsAdminUserOrOwnerReadAndUpdateOnly(BasePermission):
+    """Admin has full access. Owner can only read and update"""
+    def has_object_permission(self, request, view, obj):
+        if obj == request.user and request.method in ['PUT', 'PATCH', 'GET']:
+            return True
+        return request.user.is_staff
 
 
 def generate_token(user):
@@ -33,6 +59,7 @@ def make_payment(payload):
     return resp.json()
 
 
+@shared_task
 def send_email(payload):
     send_mail(
         payload['subject'],
@@ -46,3 +73,27 @@ def send_email(payload):
 def update_seat_status(seat, status):
     seat.status=status
     seat.save()
+
+
+def send_reminders():
+    """Send reminders to traveller who are travelling the next day"""
+    next_day = (datetime.now() + timedelta(days=1)).date()
+    tickets = Ticket.objects.filter(seat__flight__departure_time__date=next_day)
+    for ticket in tickets:
+        passenger = ticket.passenger
+        flight_date = datetime.strftime(ticket.seat.flight.departure_time, '%Y-%m-%d %H:%M')
+        flight_number = ticket.seat.flight.number
+        seat_number = ticket.seat.seat_number
+        email = ticket.booked_by.email
+        mail_data = {
+            'email': email,
+            'subject': 'Travel Reminder',
+            'content': f'Please be reminded of your schedulled flight as follows.\nPassenger: {passenger}\nDate & time: {flight_date}\nFlight no.: {flight_number}\nSeat no.: {seat_number}'
+        }
+        send_email.delay(mail_data)
+
+
+def start():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(send_reminders, 'cron', hour=12, minute=0)
+    scheduler.start()
