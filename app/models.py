@@ -15,9 +15,6 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=20, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def repr(self):
-        return f'{self.first_name} {self.last_name}'
-
 
 class Flight(models.Model):
     """Flight model class"""
@@ -33,9 +30,6 @@ class Flight(models.Model):
         default=enums.FlightStatus.active)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def repr(self):
-        return f'Flight No. {self.number}'
 
 
 class Seat(models.Model):
@@ -53,9 +47,6 @@ class Seat(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def repr(self):
-        return f'Seat no. {self.seat_number} on Flight No. {self.flight.number}'
-
 
 class Ticket(models.Model):
     """A model class representing a passenger ticket"""
@@ -68,7 +59,3 @@ class Ticket(models.Model):
         default=enums.PaymentStatus.paid)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def repr(self):
-        return f'Seat no. {self.seat_number} on Flight No. {self.flight.number}'
-

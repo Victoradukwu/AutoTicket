@@ -16,11 +16,12 @@ def user_signup(request):
     data = request.data
 
     if data['password'] == data['confirm_password']:
+        data = data.copy()
         img = data['image']
         data['image'] = upload_image(img)
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
-            serializer.validated_data['password'] =  make_password(data['password'])
+            serializer.validated_data['password'] = make_password(data['password'])
             serializer.validated_data['username'] = serializer.validated_data['email']
             serializer.save()
 
@@ -79,6 +80,7 @@ class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['POST'])
 def make_reservation(request):
     data = request.data
+    data = data.copy()
     if not data['email']:
         data['email'] = request.user.email
     serializer = TicketSerializer(data=data)
