@@ -10,6 +10,7 @@ class SeatStatus(str, enum.Enum):
     available = '1'
     booked = '0'
 
+
 class PaymentStatus(str, enum.Enum):
     paid = 'paid'
     pending = 'pending'
