@@ -58,4 +58,8 @@ PAYSTACK_TEST_PUBLICK_KEY=your_paystack_test_public_key
 ```sh
 > $ python manage.py runserver
 ```
+* Run tests
+```sh
+> $ python manage.py test
+```
 
