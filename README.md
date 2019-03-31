@@ -24,15 +24,15 @@ https://auto-ticket.herokuapp.com/
 
 * Clone the application to your local system
 ```Sh
-> $ `git clone https://github.com/Victoradukwu/AutoTicket.git`
+> $ git clone https://github.com/Victoradukwu/AutoTicket.git
 ```
 * Change the directory on your local system
 ```Sh
-> $ `cd /AutoTicket`
+> $ cd /AutoTicket
 ```
 * Install all dependencies
 ```Sh
-> $ `pip install -r requirements.txt`
+> $ pip install -r requirements.txt
 ```
 * create a .env file at you app root and populate it withb the encironment variables such as:
 ```Sh
@@ -52,7 +52,7 @@ PAYSTACK_TEST_PUBLICK_KEY=your_paystack_test_public_key
 
 * Migrate the application
 ```Sh
-> $ `python manage.py migrate`
+> $ python manage.py migrate
 ```
 * Start the application
 ```sh
@@ -60,6 +60,7 @@ PAYSTACK_TEST_PUBLICK_KEY=your_paystack_test_public_key
 ```
 * Run tests
 ```sh
-> $ python manage.py test
+> $ coverage run manage.py test
+> $ coverage report
 ```
 
