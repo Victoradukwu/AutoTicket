@@ -10,7 +10,7 @@ class TestFlightViews(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.auth_user = mommy.make('app.User')
+        self.auth_user = mommy.make('app.User', is_staff=True)
         self.client.force_login(self.auth_user)
 
     def test_flight_list_view(self):
@@ -53,12 +53,3 @@ class TestFlightViews(TestCase):
         resp = self.client.delete(reverse('flight_detail', args=[flt.id]))
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(Flight.objects.all().count(), 0)
-
-    # def test_flight_update_view(self):
-    #     flt = mommy.make('Flight')
-    #
-    #     resp = self.client.put(reverse('flight_detail', args=[flt.id]), {'departure': 'Kaduna'})
-    #     print('LLLLLLL', resp, resp.data)
-    #     self.assertEqual(resp.status_code, 200)
-    #     self.assertEqual(Flight.objects.all().count(), 1)
-    #     self.assertEqual(Flight.objects.first().departure, 'Kaduna')
