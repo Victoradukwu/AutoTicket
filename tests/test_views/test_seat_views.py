@@ -2,7 +2,7 @@
 from model_mommy import mommy
 from django.test import TestCase, Client
 from django.urls import reverse
-from app.models import Seat, Flight
+from app.models import Seat
 
 
 class TestFlightViews(TestCase):
@@ -10,7 +10,7 @@ class TestFlightViews(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.auth_user = mommy.make('app.User')
+        self.auth_user = mommy.make('app.User', is_staff=True)
         self.client.force_login(self.auth_user)
 
     def test_seat_list_view(self):

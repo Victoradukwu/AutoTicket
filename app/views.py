@@ -156,6 +156,7 @@ def book_ticket(request):
                 'subject': 'Ticket Booking',
                 'content': f'Ticket successfully booked\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
             }
+
             send_email(mail_data)
             return Response({'message': 'Ticket successfully booked. Details have been sent by email'}, status=status.HTTP_200_OK)
         return Response({'message': pay_resp.data.display_text}, status=status.HTTP_400_BAD_REQUEST)
