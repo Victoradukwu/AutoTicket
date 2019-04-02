@@ -13,6 +13,20 @@ https://auto-ticket.herokuapp.com/
 * User can check the status of their flight
 * User can make flight reservations
 * User can make online payment using credit/debit card
+
+## API Endpoints 
+* Register: users/register/
+* Register: POST users/register/
+* Log in: POST users/login/
+* List of users: GET: users/
+* List available flights: GET flights/
+* Details of a Flight: GET flights/pk/
+* List available seat objetcs: GET seats/
+* Details of a seat object: GET seat/pk/
+* Make Reservation: POST tickets/reservation/
+* Book ticket: POST tickets/book/
+* Make pyment: 'payment/'
+
 ## Technologies used
 * Python: A fast growing programming language
 * Postgres DBMS: An open-source RDBMS for storing data
