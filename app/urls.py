@@ -4,6 +4,7 @@ from django.urls import path
 from django.views.decorators.cache import cache_page
 
 urlpatterns = [
+    path('', views.welcome, name='welcome'),
     path('users/register/', views.user_signup, name='user_register'),
     path('users/login/', views.user_signin, name='user_login'),
     path('users/', views.UserList.as_view(), name='user_list'),

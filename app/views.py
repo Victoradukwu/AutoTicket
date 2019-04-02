@@ -1,6 +1,6 @@
 """A module of app views"""
 from datetime import datetime
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.base_user import make_password, check_password
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
@@ -19,6 +19,11 @@ from .utils.helpers import(
     IsAdminUserOrOwnerReadOnly,
     IsAdminUserOrOwnerReadAndUpdateOnly
 )
+
+
+@api_view(['GET'])
+def welcome(request):
+    return render(request, 'app/welcome.html')
 
 
 @api_view(['POST'])
