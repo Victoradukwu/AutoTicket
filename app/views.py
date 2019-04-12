@@ -28,6 +28,7 @@ def welcome(request):
 
 @api_view(['POST'])
 def user_signup(request):
+    """Endpoint to register a user"""
     data = request.data
 
     if data['password'] == data['confirm_password']:
@@ -54,6 +55,7 @@ def user_signup(request):
 
 @api_view(['POST'])
 def user_signin(request):
+    """Endpoint for user login"""
     data = request.data
     user = get_object_or_404(User, email=data['email'])
     if check_password(data['password'], user.password):
@@ -69,6 +71,7 @@ def user_signin(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def make_reservation(request):
+    """Endpoint to make flight reservation"""
     data = request.data
     data = data.copy()
     if not data['email']:
@@ -97,6 +100,7 @@ def make_reservation(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def payment(request):
+    """Endpoint to enable online payment using Paystack"""
     data = request.data
     payment_data = {
         "email": data['email'],
@@ -118,6 +122,7 @@ def payment(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 def book_ticket(request):
+    """Book flight ticket"""
     data = request.data
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
@@ -157,7 +162,14 @@ def book_ticket(request):
 
 
 class FlightList(generics.ListCreateAPIView):
-    """A class view for creating a flight or getting a flight list"""
+    """
+        get:
+        Return the list of all flight objects
+
+        post:
+        creates a new flight object
+
+        """
 
     permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Flight.objects.all()
@@ -165,7 +177,22 @@ class FlightList(generics.ListCreateAPIView):
 
 
 class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for single-flight operations: retrieve, delete, update"""
+    """
+
+    get:
+    Return the details of a single flight
+
+    put:
+    Updates a given flight, non-partial update
+
+    patch:
+    Updates a given flight, partial update
+
+
+
+    delete:
+    Deletes a single flight
+    """
 
     permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Flight.objects.all()
@@ -173,7 +200,14 @@ class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class SeatList(generics.ListCreateAPIView):
-    """A class view for creating a seat object or getting a seat list"""
+    """
+        get:
+        Return the list of all seat objects.
+
+        post:
+        creates a new seat object.
+
+        """
 
     permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Seat.objects.all()
@@ -181,7 +215,21 @@ class SeatList(generics.ListCreateAPIView):
 
 
 class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for single-seat operations: retrieve, delete, update"""
+    """
+
+        get:
+        Return the details of a single seat object
+
+        put:
+        Updates a given seat object, non-partial update
+
+        patch:
+        Updates a given sear, partial update
+
+
+        delete:
+        Deletes a single object
+        """
 
     permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Seat.objects.all()
@@ -200,7 +248,21 @@ class TicketList(generics.ListAPIView):
 
 
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for ticket operations: retrieve, delete, update"""
+    """
+
+    get:
+    Return the details of a single ticket
+
+    put:
+    Updates a given ticket, non-partial update
+
+    patch:
+    Updates a given ticket, partial update
+
+
+    delete:
+    Deletes a single ticket
+    """
 
     permission_classes = (IsAdminUserOrOwnerReadOnly,)
     serializer_class = TicketSerializer
@@ -211,11 +273,28 @@ class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    """A class view for single-user operations: retrieve, delete, update"""
+    """
+
+    get:
+    Return the details of a single user
+
+    put:
+    Updates a given user, non-partial update
+
+    patch:
+    Updates a given user, partial update
+
+
+    delete:
+    Deletes a single user
+    """
 
     permission_classes = (IsAdminUserOrOwnerReadAndUpdateOnly,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
 
 class UserList(generics.ListAPIView):
