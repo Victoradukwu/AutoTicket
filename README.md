@@ -61,13 +61,15 @@ CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 PAYSTACK_TEST_SECRET_KEY=your_paystack_test_secret_key
 PAYSTACK_TEST_PUBLICK_KEY=your_paystack_test_public_key
-
+CELERY_BROKER_URL='redis://localhost'
 ```
 
 * Migrate the application
 ```Sh
 > $ python manage.py migrate
 ```
+* Install Redis and start the redis server
+
 * Start the application
 ```sh
 > $ python manage.py runserver

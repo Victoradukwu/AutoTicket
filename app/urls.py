@@ -16,6 +16,7 @@ urlpatterns = [
     path('tickets/<int:pk>/', views.TicketDetail.as_view(), name='ticket_detail'),
     path('tickets/reservation/', views.make_reservation, name='reservation'),
     path('tickets/book/', views.book_ticket, name='book_ticket'),
-    path('tickets/list/<flight>', views.TicketList.as_view(), name='list_ticket'),
+    path('tickets/list/<flight>', views.FlightTicketList.as_view(), name='list_flight_ticket'),
+    path('tickets/list/', views.TicketList.as_view(), name='list_ticket'),
     path('payment/', views.payment, name='payment'),
    ]
