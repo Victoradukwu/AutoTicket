@@ -3,13 +3,26 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.base_user import make_password, check_password
 from rest_framework import status, generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import UserSerializer, FlightSerializer, SeatSerializer, TicketSerializer
 from .models import User, Flight, Seat, Ticket
 from .utils.enums import SeatStatus, PaymentStatus
-from .utils.helpers import(
+from drf_yasg.utils import swagger_auto_schema
+from .serializers import (
+    UserSerializer,
+    FlightSerializer,
+    SeatSerializer,
+    TicketSerializer,
+    LoginSerializer,
+    RegisterSerializer,
+    ReservationSerializer,
+    BookingSerializer,
+    PaymentSerializer
+
+)
+from .utils.helpers import (
     generate_token,
     upload_image,
     send_email,
@@ -26,22 +39,27 @@ def welcome(request):
     return render(request, 'app/welcome.html')
 
 
+@swagger_auto_schema(method='post', request_body=RegisterSerializer)
 @api_view(['POST'])
+@parser_classes((FormParser, MultiPartParser))
 def user_signup(request):
-    """Endpoint to register a user"""
+    """
+    Endpoint to register a user
+
+    """
     data = request.data
 
-    if data['password'] == data['confirm_password']:
+    if data.get('password') == data.get('confirm_password'):
         data = data.copy()
-        img = data['image']
+        img = data.get('image')
         data['image'] = upload_image(img)
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
-            serializer.validated_data['password'] = make_password(data['password'])
-            serializer.validated_data['username'] = serializer.validated_data['email']
+            serializer.validated_data['password'] = make_password(data.get('password'))
+            serializer.validated_data['username'] = serializer.validated_data.get('email')
             serializer.save()
 
-            user = get_object_or_404(User, email=data['email'])
+            user = get_object_or_404(User, email=data.get('email'))
             token = generate_token(user)
             payload = {
                         'token': token,
@@ -53,12 +71,18 @@ def user_signup(request):
     return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post', request_body=LoginSerializer)
 @api_view(['POST'])
+@parser_classes((FormParser,))
 def user_signin(request):
-    """Endpoint for user login"""
+    """
+    Endpoint for user login
+
+    """
     data = request.data
-    user = get_object_or_404(User, email=data['email'])
-    if check_password(data['password'], user.password):
+
+    user = get_object_or_404(User, email=data.get('email'))
+    if check_password(data.get('password'), user.password):
         token = generate_token(user)
         payload = {
                     'token': token,
@@ -68,13 +92,18 @@ def user_signin(request):
     return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post', request_body=ReservationSerializer)
 @api_view(['POST'])
+@parser_classes((FormParser,))
 @permission_classes((IsAuthenticated, ))
 def make_reservation(request):
-    """Endpoint to make flight reservation"""
+    """
+    Endpoint to make flight reservation
+
+    """
     data = request.data
     data = data.copy()
-    if not data['email']:
+    if not data.get('email'):
         data['email'] = request.user.email
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
@@ -97,20 +126,30 @@ def make_reservation(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='post', request_body=PaymentSerializer)
 @api_view(['POST'])
+@parser_classes((FormParser,))
 @permission_classes((IsAuthenticated, ))
 def payment(request):
-    """Endpoint to enable online payment using Paystack"""
+    """
+    Endpoint to enable online payment using Paystack. Use the following card details.
+
+    "pin": "1111",
+    "number": "507850785078507812",
+    "cvv": "081",
+    "expiry_month": "12",
+    "expiry_year":  "2020"
+    """
     data = request.data
     payment_data = {
-        "email": data['email'],
-        "amount": data['amount'],
-        "pin": data['pin'],
+        "email": data.get('email'),
+        "amount": data.get('amount'),
+        "pin": data.get('pin'),
         "card": {
-            "number": data['number'],
-            "cvv": data['cvv'],
-            "expiry_month": data['expiry_month'],
-            "expiry_year":  data['expiry_year']
+            "number": data.get('number'),
+            "cvv": data.get('cvv'),
+            "expiry_month": data.get('expiry_month'),
+            "expiry_year":  data.get('expiry_year')
         }
     }
     pay_resp = make_payment(payment_data)
@@ -119,10 +158,20 @@ def payment(request):
     return Response({'message': 'Payment successful'}, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='post', request_body=BookingSerializer)
 @api_view(['POST'])
+@parser_classes((FormParser,))
 @permission_classes((IsAuthenticated, ))
 def book_ticket(request):
-    """Book flight ticket"""
+    """
+    Book flight ticket. Use the following card details
+
+    "pin": "1111",
+    "number": "507850785078507812",
+    "cvv": "081",
+    "expiry_month": "12",
+    "expiry_year":  "2020"
+    """
     data = request.data
     serializer = TicketSerializer(data=data)
     if serializer.is_valid():
@@ -131,12 +180,12 @@ def book_ticket(request):
         payment_data = {
             'email': data.get('email', request.user.email),
             "amount": str(seat.flight.fare),
-            "pin": data['pin'],
+            "pin": data.get('pin'),
             "card": {
-                "number": data['number'],
-                "cvv": data['cvv'],
-                "expiry_month": data['expiry_month'],
-                "expiry_year": data['expiry_year']
+                "number": data.get('number'),
+                "cvv": data.get('cvv'),
+                "expiry_month": data.get('expiry_month'),
+                "expiry_year": data.get('expiry_year')
             }
         }
         pay_resp = make_payment(payment_data)
@@ -150,7 +199,7 @@ def book_ticket(request):
             flight_number = seat.flight.number
             seat_number = seat.seat_number
             mail_data = {
-                'email': data['email'],
+                'email': data.get('email'),
                 'subject': 'Ticket Booking',
                 'content': f'Ticket successfully booked\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
             }
@@ -236,15 +285,23 @@ class SeatDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SeatSerializer
 
 
-class TicketList(generics.ListAPIView):
+class FlightTicketList(generics.ListAPIView):
     """A class view for listing all tickets booked for a particular flight"""
 
     permission_classes = (IsAdminUser,)
     serializer_class = TicketSerializer
 
     def get_queryset(self):
-        flight = self.kwargs['flight']
+        flight = self.kwargs.get('flight')
         return Ticket.objects.filter(seat__flight=flight)
+
+
+class TicketList(generics.ListAPIView):
+    """A class view for listing all tickets"""
+
+    permission_classes = (IsAdminUser,)
+    serializer_class = TicketSerializer
+    queryset = Ticket.objects.all()
 
 
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
