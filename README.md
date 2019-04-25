@@ -2,8 +2,8 @@
 
 ## Introduction
 **AutoTicket** is an application that automates airline ticketing system.
-## __Application Link__
-https://auto-ticket.herokuapp.com/
+## __Application API Link__
+https://auto-ticket.herokuapp.com/swagger/
 
 ## Key Application features  
 * User can register abd log in
