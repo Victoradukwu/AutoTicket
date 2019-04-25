@@ -73,7 +73,7 @@ def user_signup(request):
 
 @swagger_auto_schema(method='post', request_body=LoginSerializer)
 @api_view(['POST'])
-@parser_classes((FormParser,))
+@parser_classes((FormParser, MultiPartParser))
 def user_signin(request):
     """
     Endpoint for user login
