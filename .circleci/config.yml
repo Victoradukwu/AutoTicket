@@ -19,6 +19,7 @@ jobs:
 
           CELERY_BROKER_URL: 'redis://localhost'
           REDIS_URL: redis://127.0.0.1:6379/1
+          DATABASE_TEST_URL: "sqlite:///autoticket.db"
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
