@@ -4,13 +4,13 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.1
-        environment:
-          DEBUG: True
-          SECRET_KEY: ce*vb^97z^fi8)h3_bcr-b=@c2b!xmq01c&o_bl)prv%=qy!j@
+#       - image: circleci/python:3.6.1
+#         environment:
+#           DEBUG: True
+#           SECRET_KEY: ce*vb^97z^fi8)h3_bcr-b=@c2b!xmq01c&o_bl)prv%=qy!j@
 
-          CELERY_BROKER_URL: 'redis://localhost'
-          REDIS_URL: redis://127.0.0.1:6379/1
+#           CELERY_BROKER_URL: 'redis://localhost'
+#           REDIS_URL: redis://127.0.0.1:6379/1
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -21,7 +21,7 @@ jobs:
 #           POSTGRES_DB: circle_test
 #           POSTGRES_PASSWORD: ""
 
-      - image: redis:5.0.2
+#       - image: redis:5.0.2
 
     working_directory: ~/AutoTicket
 
