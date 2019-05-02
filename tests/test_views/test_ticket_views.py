@@ -3,6 +3,7 @@ from model_mommy import mommy
 from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch
+from urllib.parse import urlencode
 
 
 class TestTicketViews(TestCase):
@@ -16,7 +17,7 @@ class TestTicketViews(TestCase):
     @patch('app.views.make_payment')
     def test_payments(self, mock_make_payment):
         mock_make_payment.return_value = {'data': {'status': 'success'}}
-        data = {
+        data = urlencode({
             'email': 'bca@bca.bca',
             'amount': 1000,
             'pin': '0000',
@@ -24,9 +25,9 @@ class TestTicketViews(TestCase):
             "cvv": 222,
             "expiry_month": 12,
             "expiry_year":  20
-        }
+        })
 
-        resp = self.client.post(reverse('payment'), data)
+        resp = self.client.post(reverse('payment'), data, content_type="application/x-www-form-urlencoded")
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.views.send_email')
@@ -34,13 +35,13 @@ class TestTicketViews(TestCase):
         mock_send_email.return_value = None
         flight = mommy.make('Flight')
         seat = mommy.make('Seat', flight=flight)
-        data = {
+        data = urlencode({
             'seat': seat.id,
             'email': 'xyz@xyz.xyc',
             'passenger': 'Duke'
-        }
+        })
 
-        resp = self.client.post(reverse('reservation'), data)
+        resp = self.client.post(reverse('reservation'), data, content_type="application/x-www-form-urlencoded")
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.views.send_email')
@@ -48,12 +49,12 @@ class TestTicketViews(TestCase):
         mock_make_payment.return_value = None
         flight = mommy.make('Flight')
         seat = mommy.make('Seat', flight=flight)
-        data = {
+        data = urlencode({
             'seat': seat.id,
             'email': 'xyz@xyz.xyc'
-        }
+        })
 
-        resp = self.client.post(reverse('reservation'), data)
+        resp = self.client.post(reverse('reservation'), data, content_type="application/x-www-form-urlencoded")
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.views.make_payment')
@@ -63,7 +64,7 @@ class TestTicketViews(TestCase):
         mock_send_mail.return_value = None
         flight = mommy.make('Flight')
         seat = mommy.make('Seat', flight=flight)
-        data = {
+        data = urlencode({
                 "passenger": "Dave",
                 "seat": seat.id,
                 "email": "vicads01@gmail.com",
@@ -72,9 +73,9 @@ class TestTicketViews(TestCase):
                 "cvv": "081",
                 "expiry_month": "12",
                 "expiry_year":  "2020"
-}
+})
 
-        resp = self.client.post(reverse('book_ticket'), data)
+        resp = self.client.post(reverse('book_ticket'), data, content_type="application/x-www-form-urlencoded")
         self.assertEqual(resp.status_code, 200)
 
     @patch('app.views.make_payment')
@@ -84,7 +85,7 @@ class TestTicketViews(TestCase):
         mock_send_mail.return_value = None
         flight = mommy.make('Flight')
         seat = mommy.make('Seat', flight=flight)
-        data = {
+        data = urlencode({
             "seat": seat.id,
             "email": "vicads01@gmail.com",
             "pin": "1111",
@@ -92,7 +93,7 @@ class TestTicketViews(TestCase):
             "cvv": "081",
             "expiry_month": "12",
             "expiry_year": "2020"
-        }
+        })
 
-        resp = self.client.post(reverse('book_ticket'), data)
+        resp = self.client.post(reverse('book_ticket'), data, content_type="application/x-www-form-urlencoded")
         self.assertEqual(resp.status_code, 400)
