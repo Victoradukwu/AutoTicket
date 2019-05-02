@@ -28,10 +28,10 @@ https://auto-ticket.herokuapp.com/swagger/
 * Make pyment: 'payment/'
 
 ## Technologies used
-* Python: A fast growing programming language
-* Postgres DBMS: An open-source RDBMS for storing data
-* Django web framework: A fullstack Python web application framework
-* Drango Restframework: A pakage for clean development of RESTful API in django
+* Python: A fast growing programming language.
+* Postgres DBMS: An open-source RDBMS for storing data.
+* Django web framework: A fullstack Python web application framework.
+* Drango Restframework: A pakage for clean development of RESTful API in django.
 
 
 ## Installing the application 
