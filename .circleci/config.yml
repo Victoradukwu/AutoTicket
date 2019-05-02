@@ -7,15 +7,7 @@ jobs:
       - image: circleci/python:3.6.1
         environment:
           DEBUG: True
-          EMAIL_HOST_USER: vicads01@gmail.com
-          EMAIL_HOST_PASSWORD: Adupiotondo10
           SECRET_KEY: ce*vb^97z^fi8)h3_bcr-b=@c2b!xmq01c&o_bl)prv%=qy!j@
-
-          CLOUD_NAME: victoradukwu
-          CLOUDINARY_API_KEY: 297581248268948
-          CLOUDINARY_API_SECRET: Oja1BPO4FNP39YfFrKkHKy1advw
-          PAYSTACK_TEST_SECRET_KEY: sk_test_a4586c98a93bc4aa0ed99b9f0be74535c1216fb6
-          PAYSTACK_TEST_PUBLICK_KEY: pk_test_54608f7d1306c0ff6496fb1db83715133c0d9bf0
 
           CELERY_BROKER_URL: 'redis://localhost'
           REDIS_URL: redis://127.0.0.1:6379/1
@@ -25,9 +17,9 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       - image: circleci/postgres:9.4
         environment:
-          POSTGRES_USER: victor
-          POSTGRES_DB: autoticket
-          POSTGRES_PASSWORD: victor
+          POSTGRES_USER: ubuntu
+          POSTGRES_DB: circle_test
+          POSTGRES_PASSWORD: ""
 
       - image: redis:5.0.2
 
