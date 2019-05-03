@@ -104,9 +104,9 @@ WSGI_APPLICATION = 'auto_ticket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'NAME': 'autoticket',
+        'USER': 'victor',
+        'PASSWORD': 'victor',
         'HOST': '127.0.0.1'
     }
 }
@@ -165,4 +165,4 @@ CACHES = {
 SCHEDULER_AUTOSTART = True
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-TEST_DATABASE_PREFIX = 'test_'
+
