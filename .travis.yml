@@ -1,10 +1,27 @@
 language: python
+
 python:
-  - "3.3"
   - "3.6"
-# command to install dependencies
+
+services: mysql
+
+env:
+  global:
+    - DJANGO_SETTINGS_MODULE="auto_ticket.travis_settings"
+    - PYTHONPATH="/home/travis/build/victoradukwu/AutoTicket"
+    - PIP_USE_MIRRORS=true
+  matrix:
+    - DJANGO=2.1 DB=mysql
+
+#commands to install dependencies
 install:
-  - pip install -r requirements.txt
-# command to run tests
+  - pip install -q Django==$DJANGO
+  - pip install -q -r requirements.txt
+
+before_script:
+  - mysql -e 'create database travis_ci_db;'
+  - python manage.py migrate --noinput
+
+#command to run the test suite
 script:
   - coverage run manage.py test && coverage report && coveralls
