@@ -104,8 +104,8 @@ WSGI_APPLICATION = 'auto_ticket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'autoticket',
-        'USER': 'victor',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': 'victor',
         'HOST': '127.0.0.1'
     }

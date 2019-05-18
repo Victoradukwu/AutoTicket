@@ -9,7 +9,11 @@ jobs:
       - image: circleci/python:3.6.4
         environment: # environment variables for primary container
           SECRET_KEY: "some_secret"
+
       - image: circleci/postgres:11.3
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle_test
 
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
