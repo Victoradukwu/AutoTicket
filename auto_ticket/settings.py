@@ -100,16 +100,26 @@ WSGI_APPLICATION = 'auto_ticket.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+ENGINES_MAPPER = {
+    'postgres': 'django.db.backends.postgresql',
+    'sqlite': 'django.db.backends.sqlite3'
+}
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': 'victor',
-        'HOST': '127.0.0.1'
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': os.getenv('POSTGRES_DB')
+        }
     }
 }
+
+
 
 
 # Password validation
