@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/Victoradukwu/AutoTicket.svg?style=svg)](https://circleci.com/gh/Victoradukwu/AutoTicket)
+[![Coverage Status](https://coveralls.io/repos/github/Victoradukwu/AutoTicket/badge.svg?branch=master)](https://coveralls.io/github/Victoradukwu/AutoTicket?branch=master)
 # AutoTicket
 
 ## Introduction
