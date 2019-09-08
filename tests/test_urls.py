@@ -4,7 +4,6 @@ from django.urls import reverse, resolve
 from app.views import (
     user_signin,
     user_signup,
-    make_reservation,
     payment,
     book_ticket,
     FlightList,
@@ -30,13 +29,6 @@ class TestUrls(SimpleTestCase):
 
         self.assertEqual(resolve(url).func, user_signup)
         self.assertEqual(resolve(url).url_name, 'user_register')
-
-    def test_reservation_resolves(self):
-        """Testing the reservation url"""
-        url = reverse('reservation')
-
-        self.assertEqual(resolve(url).func, make_reservation)
-        self.assertEqual(resolve(url).url_name, 'reservation')
 
     def test_payment_resolves(self):
         """Testing the payment url"""

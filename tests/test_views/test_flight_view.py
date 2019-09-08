@@ -35,7 +35,7 @@ class TestFlightViews(TestCase):
             'departure':  flt.departure,
             'destination': flt.fare,
             'fare': flt.fare,
-            'status': str(flt.status),
+            'status': flt.status,
             'departure_time': flt.departure_time,
             'number': flt.number,
             'created_at':flt.created_at,
