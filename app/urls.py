@@ -14,7 +14,6 @@ urlpatterns = [
     path('seats/', views.SeatList.as_view(), name='seat_list'),
     path('seats/<int:pk>/', views.SeatDetail.as_view(), name='seat_detail'),
     path('tickets/<int:pk>/', views.TicketDetail.as_view(), name='ticket_detail'),
-    path('tickets/reservation/', views.make_reservation, name='reservation'),
     path('tickets/book/', views.book_ticket, name='book_ticket'),
     path('tickets/list/<flight>', views.FlightTicketList.as_view(), name='list_flight_ticket'),
     path('tickets/list/', views.TicketList.as_view(), name='list_ticket'),

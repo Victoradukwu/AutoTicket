@@ -8,12 +8,14 @@ from celery import shared_task
 from django.core.mail import send_mail
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from apscheduler.schedulers.background import BackgroundScheduler
-from ..models import Ticket
+from django_filters import rest_framework as filters
+from ..models import Ticket, Flight
 
 
 class IsAdminUserOrReadOnly(BasePermission):
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or request.user.is_staff
+        return request.method in SAFE_METHODS \
+               or (request.user.is_authenticated & request.user.is_staff)
 
 
 class IsAdminUserOrOwnerReadOnly(BasePermission):
@@ -97,3 +99,13 @@ def start():
     scheduler = BackgroundScheduler()
     scheduler.add_job(send_reminders, 'cron', hour=12, minute=0)
     scheduler.start()
+
+
+class FlightFilter(filters.FilterSet):
+    destination = filters.CharFilter(lookup_expr='icontains')
+    departure = filters.CharFilter(lookup_expr='icontains')
+    departure_time = filters.LookupChoiceFilter(field_name='departure_time', lookup_choices=[('exact', 'On'), ('gte', 'After'), ('lte', 'Before')])
+
+    class Meta:
+        model = Flight
+        fields = ('destination', 'departure', 'departure_time', 'status',)

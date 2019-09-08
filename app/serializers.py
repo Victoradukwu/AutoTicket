@@ -9,19 +9,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password', 'phone_number', 'image')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'image')
         extra_kwargs = {
             'password': {'write_only': True}
         }
-
-
-class FlightSerializer(serializers.ModelSerializer):
-    """FlightSerializer class"""
-    seats = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
-
-    class Meta:
-        model = Flight
-        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'seats')
 
 
 class SeatSerializer(serializers.ModelSerializer):
@@ -32,13 +23,31 @@ class SeatSerializer(serializers.ModelSerializer):
         fields = ('id', 'status', 'seat_number', 'flight')
 
 
+class FlightSerializer(serializers.ModelSerializer):
+    """FlightSerializer class"""
+    seats = SeatSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'seats')
+
+
 class TicketSerializer(serializers.ModelSerializer):
     """TicketSerializer class"""
+    seat = SeatSerializer(read_only=True)
+    booked_by = UserSerializer(read_only=True)
+    passenger = serializers.CharField(write_only=True)
+    flight = serializers.CharField(write_only=True)
+    pin = serializers.CharField(write_only=True)
+    number = serializers.CharField(write_only=True)
+    cvv = serializers.CharField(write_only=True)
+    expiry_month = serializers.CharField(write_only=True)
+    expiry_year = serializers.CharField(write_only=True)
 
     class Meta:
         model = Ticket
-        fields = '__all__'
-        read_only_fields = ('booked_by',)
+        fields = ('__all__')
+        read_only_fields = ('booked_by', 'seat')
 
 
 class LoginSerializer(serializers.Serializer):
@@ -73,8 +82,8 @@ class BookingSerializer(serializers.Serializer):
 
 
 class PaymentSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    amount = serializers.IntegerField
+    email = serializers.EmailField(required=False)
+    amount = serializers.DecimalField(max_digits=9, decimal_places=2)
     pin = serializers.CharField(max_length=200)
     number = serializers.CharField(max_length=200)
     cvv = serializers.CharField(max_length=200)

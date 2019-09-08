@@ -35,11 +35,9 @@ class TestFlightViews(TestCase):
         flt = mommy.make('Flight')
         seat = mommy.make('Seat', flight=flt)
         data = {
-            'seat_number':  seat.seat_number[:2:],
-            'status': str(seat.status),
+            'seat_number':  seat.seat_number + 1,
+            'status': seat.status,
             'flight': flt.id,
-            'created_at': seat.created_at,
-            'updated': seat.updated_at
         }
 
         resp = self.client.post(reverse('seat_list'), data)

@@ -1,7 +1,6 @@
 """A module of custom application models"""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from .utils import enums
 
 
 class User(AbstractUser):
@@ -18,31 +17,35 @@ class User(AbstractUser):
 
 class Flight(models.Model):
     """Flight model class"""
+    STATUS_CHOICES = [
+        (1, 'active'),
+        (0, 'cancelled')
+    ]
 
     departure = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     fare = models.DecimalField(max_digits=6, decimal_places=2)
     number = models.CharField(max_length=20)
     departure_time = models.DateTimeField()
-    status = models.CharField(
-        max_length=1,
-        choices=[(tag, tag.value) for tag in enums.FlightStatus],
-        default=enums.FlightStatus.active)
+    status = models.IntegerField(
+        choices=STATUS_CHOICES,
+        default=1)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Seat(models.Model):
     """A model class representing a particular seat on a particular flight"""
+    STATUS_CHOICES = [
+        (1, 'available'),
+        (0, 'booked')
+    ]
 
     class Meta:
         unique_together = (('seat_number', 'flight'),)
 
-    seat_number = models.CharField(max_length=6)
-    status = models.CharField(
-        max_length=1,
-        choices=[(tag, tag.value) for tag in enums.SeatStatus],
-        default=enums.SeatStatus.available)
+    seat_number = models.IntegerField()
+    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     flight = models.ForeignKey(Flight, related_name='seats', on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -52,11 +55,7 @@ class Ticket(models.Model):
     """A model class representing a passenger ticket"""
 
     passenger = models.CharField(max_length=100)
-    seat = models.OneToOneField(Seat, on_delete=models.CASCADE, primary_key=True)
+    seat = models.OneToOneField(Seat, on_delete=models.CASCADE)
     booked_by = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE)
-    payment_status = models.CharField(
-        max_length=10,
-        choices=[(tag, tag.value) for tag in enums.PaymentStatus],
-        default=enums.PaymentStatus.paid)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
