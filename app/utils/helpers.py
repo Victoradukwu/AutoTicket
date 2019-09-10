@@ -109,3 +109,14 @@ class FlightFilter(filters.FilterSet):
     class Meta:
         model = Flight
         fields = ('destination', 'departure', 'departure_time', 'status',)
+
+
+class TicketFilter(filters.FilterSet):
+    passenger = filters.CharFilter(lookup_expr='icontains')
+    booked_by = filters.CharFilter(field_name='booked_by__email', lookup_expr='icontains')
+    flight_number = filters.CharFilter(field_name='seat__flight', lookup_expr='number__icontains')
+    flight_date = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_time__date')
+
+    class Meta:
+        model = Ticket
+        fields = ('passenger', 'booked_by', 'flight_number', 'flight_date')

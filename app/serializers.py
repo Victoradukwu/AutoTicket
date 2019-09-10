@@ -15,28 +15,33 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
 
+class FlightSerializer(serializers.ModelSerializer):
+    """FlightSerializer class"""
+    available_seats = serializers.SerializerMethodField()
+
+    def get_available_seats(self, obj):
+        return [seat.seat_number for seat in obj.seats.filter(status=1)]
+
+    class Meta:
+        model = Flight
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'available_seats')
+
+
 class SeatSerializer(serializers.ModelSerializer):
     """SeatSerializer class"""
+
+    flight = FlightSerializer(read_only=True)
 
     class Meta:
         model = Seat
         fields = ('id', 'status', 'seat_number', 'flight')
 
 
-class FlightSerializer(serializers.ModelSerializer):
-    """FlightSerializer class"""
-    seats = SeatSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Flight
-        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'seats')
-
-
 class TicketSerializer(serializers.ModelSerializer):
     """TicketSerializer class"""
     seat = SeatSerializer(read_only=True)
     booked_by = UserSerializer(read_only=True)
-    passenger = serializers.CharField(write_only=True)
+    passenger = serializers.CharField()
     flight = serializers.CharField(write_only=True)
     pin = serializers.CharField(write_only=True)
     number = serializers.CharField(write_only=True)

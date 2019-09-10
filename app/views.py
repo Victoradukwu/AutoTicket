@@ -29,6 +29,7 @@ from .utils.helpers import (
     make_payment,
     update_seat_status,
     FlightFilter,
+    TicketFilter,
     IsAdminUserOrReadOnly,
     IsAdminUserOrOwnerReadOnly,
     IsAdminUserOrOwnerReadAndUpdateOnly
@@ -87,6 +88,7 @@ def user_signin(request):
                     'token': token,
                     'data': UserSerializer(user).data
                 }
+        payload['data']['isStaff'] = user.is_staff
         return Response(payload, status=status.HTTP_200_OK)
     return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -270,6 +272,7 @@ class TicketList(generics.ListAPIView):
     """A class view for listing all tickets"""
 
     permission_classes = (IsAdminUser,)
+    filterset_class = TicketFilter
     serializer_class = TicketSerializer
     queryset = Ticket.objects.all()
 
