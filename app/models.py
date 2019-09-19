@@ -26,7 +26,8 @@ class Flight(models.Model):
     destination = models.CharField(max_length=100)
     fare = models.DecimalField(max_digits=6, decimal_places=2)
     number = models.CharField(max_length=20)
-    departure_time = models.DateTimeField()
+    departure_date = models.DateField()
+    departure_time = models.TimeField()
     status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=1)

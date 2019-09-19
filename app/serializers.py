@@ -24,17 +24,31 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'available_seats')
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'departure_date', 'available_seats')
 
 
 class SeatSerializer(serializers.ModelSerializer):
     """SeatSerializer class"""
 
-    flight = FlightSerializer(read_only=True)
+    flight_info = serializers.SerializerMethodField()
+    flight_number = serializers.CharField(write_only=True)
+
+    def get_flight_info(self, obj):
+        flight = Flight.objects.get(id=obj.flight_id)
+        return FlightSerializer(flight).data
 
     class Meta:
         model = Seat
-        fields = ('id', 'status', 'seat_number', 'flight')
+        fields = ('id', 'status', 'seat_number', 'flight_number', 'flight_info')
+
+    def create(self, validated_data):
+        flight_id = Flight.objects.get(number=validated_data.get('flight_number'))
+
+        return Seat.objects.create(flight=flight_id, seat_number=validated_data.get('seat_number'))
+
+    extra_kwargs = {
+        'flight_number': {'write_only': True}
+    }
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -51,7 +65,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ('__all__')
+        fields = '__all__'
         read_only_fields = ('booked_by', 'seat')
 
 

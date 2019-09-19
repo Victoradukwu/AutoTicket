@@ -1,5 +1,4 @@
 """A module of app views"""
-from datetime import datetime
 import simplejson as json
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.base_user import make_password, check_password
@@ -166,13 +165,14 @@ def book_ticket(request):
             Ticket.objects.create(seat=seat, passenger=serializer.validated_data['passenger'], booked_by=request.user)
             update_seat_status(seat, SeatStatus.booked)
 
-            flight_date = datetime.strftime(seat.flight.departure_time, '%Y-%m-%d %H:%M')
+            flight_date = seat.flight.departure_date
+            flight_time = seat.flight.departure_time
             flight_number = seat.flight.number
             seat_number = seat.seat_number
             mail_data = {
                 'email': data.get('email'),
                 'subject': 'Ticket Booking',
-                'content': f'Ticket successfully booked\n date: {flight_date}\n flight no.: {flight_number}\n seat no.: {seat_number}'
+                'content': f'Ticket successfully booked\n date: {flight_date}\n time: {flight_time}\n flight no.: {flight_number}\n seat no.: {seat_number}'
             }
 
             send_email(mail_data)
@@ -271,10 +271,14 @@ class FlightTicketList(generics.ListAPIView):
 class TicketList(generics.ListAPIView):
     """A class view for listing all tickets"""
 
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAuthenticated,)
     filterset_class = TicketFilter
     serializer_class = TicketSerializer
-    queryset = Ticket.objects.all()
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Ticket.objects.all()
+        return Ticket.objects.filter(booked_by=self.request.user).order_by('id')
 
 
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):

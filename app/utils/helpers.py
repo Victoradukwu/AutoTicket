@@ -104,18 +104,18 @@ def start():
 class FlightFilter(filters.FilterSet):
     destination = filters.CharFilter(lookup_expr='icontains')
     departure = filters.CharFilter(lookup_expr='icontains')
-    departure_time = filters.LookupChoiceFilter(field_name='departure_time', lookup_choices=[('exact', 'On'), ('gte', 'After'), ('lte', 'Before')])
+    departure_date = filters.LookupChoiceFilter(field_name='departure_date', lookup_choices=[('exact', 'On'), ('gte', 'After'), ('lte', 'Before')])
 
     class Meta:
         model = Flight
-        fields = ('destination', 'departure', 'departure_time', 'status',)
+        fields = ('destination', 'departure', 'departure_date', 'status',)
 
 
 class TicketFilter(filters.FilterSet):
     passenger = filters.CharFilter(lookup_expr='icontains')
     booked_by = filters.CharFilter(field_name='booked_by__email', lookup_expr='icontains')
     flight_number = filters.CharFilter(field_name='seat__flight', lookup_expr='number__icontains')
-    flight_date = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_time__date')
+    flight_date = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_date')
 
     class Meta:
         model = Ticket
