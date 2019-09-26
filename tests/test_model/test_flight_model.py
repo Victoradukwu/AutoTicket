@@ -13,6 +13,7 @@ class TestFlightModel(TestCase):
             fare=flight.fare,
             number=flight.number,
             departure_time=flight.departure_time,
+            departure_date=flight.departure_date,
             status=flight.status,
             created_at=flight.created_at,
             updated_at=flight.updated_at

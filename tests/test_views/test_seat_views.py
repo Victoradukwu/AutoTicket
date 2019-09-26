@@ -37,7 +37,7 @@ class TestFlightViews(TestCase):
         data = {
             'seat_number':  seat.seat_number + 1,
             'status': seat.status,
-            'flight': flt.id,
+            'flight_number': flt.number,
         }
 
         resp = self.client.post(reverse('seat_list'), data)

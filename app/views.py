@@ -177,7 +177,7 @@ def book_ticket(request):
 
             send_email(mail_data)
             return Response({'message': 'Ticket successfully booked. Details have been sent by email'}, status=status.HTTP_200_OK)
-        return Response({'message': pay_resp['data']['display_text']}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': pay_resp['data']['message']}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
