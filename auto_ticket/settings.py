@@ -26,9 +26,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app.apps.AppConfig',
     'rest_framework',
     'cloudinary',
-    'app.apps.AppConfig',
     'drf_yasg',
     'django_filters',
     'corsheaders'
@@ -64,7 +64,7 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': timedelta(days=30),
+    'JWT_EXPIRATION_DELTA': timedelta(days=1),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer'
 }
 
@@ -88,7 +88,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'auto_ticket.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -129,7 +128,7 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'app.User'
 
-#Email setup
+# Email setup
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
@@ -151,6 +150,7 @@ CACHES = {
         "KEY_PREFIX": "autoticket"
     }
 }
+CACHE_TTL = 30
 
 SCHEDULER_AUTOSTART = True
 
