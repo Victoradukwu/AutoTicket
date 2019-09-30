@@ -113,7 +113,9 @@ class FlightFilter(filters.FilterSet):
 
 class TicketFilter(filters.FilterSet):
     passenger = filters.CharFilter(lookup_expr='icontains')
-    booked_by = filters.CharFilter(field_name='booked_by__email', lookup_expr='icontains')
+    booked_by = filters.LookupChoiceFilter(field_name='booked_by__email',
+                                                lookup_choices=[('iexact', 'Exactly matches'), ('icontains', 'Contains')])
+
     flight_number = filters.CharFilter(field_name='seat__flight', lookup_expr='number__icontains')
     flight_date = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_date')
 
