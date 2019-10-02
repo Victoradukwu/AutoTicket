@@ -18,6 +18,11 @@ class IsAdminUserOrReadOnly(BasePermission):
                or (request.user.is_authenticated & request.user.is_staff)
 
 
+class IsAdminOrCreateOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method == 'POST' or request.user.is_staff
+
+
 class IsAdminUserOrOwnerReadOnly(BasePermission):
     """Admin has full access. Owner has read only"""
     def has_object_permission(self, request, view, obj):

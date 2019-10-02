@@ -83,28 +83,3 @@ class RegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=200)
     image = serializers.ImageField()
 
-
-class ReservationSerializer(serializers.Serializer):
-    seat = serializers.IntegerField()
-    passenger = serializers.CharField(max_length=200)
-
-
-class BookingSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    passenger = serializers.CharField(max_length=200)
-    seat = serializers.IntegerField()
-    pin = serializers.CharField(max_length=200)
-    number = serializers.CharField(max_length=200)
-    cvv = serializers.CharField(max_length=200)
-    expiry_month = serializers.CharField(max_length=200)
-    expiry_year = serializers.CharField(max_length=200)
-
-
-class PaymentSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False)
-    amount = serializers.DecimalField(max_digits=9, decimal_places=2)
-    pin = serializers.CharField(max_length=200)
-    number = serializers.CharField(max_length=200)
-    cvv = serializers.CharField(max_length=200)
-    expiry_month = serializers.CharField(max_length=200)
-    expiry_year = serializers.CharField(max_length=200)
