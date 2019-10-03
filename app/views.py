@@ -1,9 +1,9 @@
 """A module of app views"""
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.base_user import make_password, check_password
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import User, Flight, Seat, Ticket
@@ -13,8 +13,7 @@ from .serializers import (
     FlightSerializer,
     SeatSerializer,
     TicketSerializer,
-    LoginSerializer,
-    RegisterSerializer,
+    LoginSerializer
 
 )
 from .utils.helpers import (
@@ -33,42 +32,43 @@ from .utils.helpers import (
 
 
 @api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer])
 def welcome(request):
-    return render(request, 'app/welcome.html')
+    return Response(template_name='app/welcome.html')
 
 
 class RegisterView(generics.CreateAPIView):
-    parser_classes = [FormParser, MultiPartParser, JSONParser]
-    serializer_class = RegisterSerializer
+    serializer_class = UserSerializer
 
     def post(self, request):
         data = request.data
 
-        if data.get('password') == data.get('confirm_password'):
-            data = data.copy()
-            img = data.get('image')
-            data['image'] = upload_image(img) if img else ''
-            serializer = UserSerializer(data=data)
-            if serializer.is_valid():
-                serializer.validated_data['password'] = make_password(data.get('password'))
-                serializer.validated_data['username'] = serializer.validated_data.get('email')
-                serializer.save()
+        data = data.copy()
+        img = data.get('image')
+        data['image'] = upload_image(img) if img else ''
 
-                payload = {
-                    'message': "Successfully signed up",
-                    'data': serializer.data
-                }
-                return Response(payload, status=status.HTTP_201_CREATED)
-            return Response({'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['password'] = make_password(data.get('password'))
+        serializer.validated_data['username'] = serializer.validated_data.get('email')
+        del serializer.validated_data['confirm_password']
+        serializer.save()
+
+        payload = {
+            'message': "Successfully signed up",
+            'data': serializer.data
+        }
+        return Response(payload, status=status.HTTP_201_CREATED)
 
 
 class LoginView(generics.GenericAPIView):
-    parser_classes = [FormParser, MultiPartParser, JSONParser]
     serializer_class = LoginSerializer
 
     def post(self, request):
         data = request.data
+
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
 
         user = get_object_or_404(User, email=data.get('email'))
         if check_password(data.get('password'), user.password):
@@ -194,44 +194,43 @@ class TicketList(generics.ListCreateAPIView):
             """
         data = request.data
         serializer = TicketSerializer(data=data)
-        if serializer.is_valid():
-            serializer.validated_data['booked_by'] = request.user
-            flight_id = serializer.validated_data.get('flight')
-            flight = Flight.objects.get(number=flight_id)
-            payment_data = {
-                "email": serializer.validated_data.get('email', request.user.email),
-                "amount": flight.fare,
-                "pin": serializer.validated_data.get('pin'),
-                "card": {
-                    "number": serializer.validated_data.get('number'),
-                    "cvv": serializer.validated_data.get('cvv'),
-                    "expiry_month": serializer.validated_data.get('expiry_month'),
-                    "expiry_year": serializer.validated_data.get('expiry_year')
-                }
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['booked_by'] = request.user
+        flight_id = serializer.validated_data.get('flight')
+        flight = Flight.objects.get(number=flight_id)
+        payment_data = {
+            "email": serializer.validated_data.get('email', request.user.email),
+            "amount": flight.fare,
+            "pin": serializer.validated_data.get('pin'),
+            "card": {
+                "number": serializer.validated_data.get('number'),
+                "cvv": serializer.validated_data.get('cvv'),
+                "expiry_month": serializer.validated_data.get('expiry_month'),
+                "expiry_year": serializer.validated_data.get('expiry_year')
             }
-            pay_resp = make_payment(payment_data)
+        }
+        pay_resp = make_payment(payment_data)
 
-            if pay_resp['data']['status'] == 'success':
-                seat = Seat.objects.filter(status=1)[0]
-                Ticket.objects.create(seat=seat, passenger=serializer.validated_data['passenger'],
-                                      booked_by=request.user)
-                update_seat_status(seat, SeatStatus.booked)
+        if pay_resp['data']['status'] == 'success':
+            seat = Seat.objects.filter(status=1)[0]
+            Ticket.objects.create(seat=seat, passenger=serializer.validated_data['passenger'],
+                                  booked_by=request.user)
+            update_seat_status(seat, SeatStatus.booked)
 
-                flight_date = seat.flight.departure_date
-                flight_time = seat.flight.departure_time
-                flight_number = seat.flight.number
-                seat_number = seat.seat_number
-                mail_data = {
-                    'email': data.get('email'),
-                    'subject': 'Ticket Booking',
-                    'content': f'Ticket successfully booked\n date: {flight_date}\n time: {flight_time}\n flight no.: {flight_number}\n seat no.: {seat_number}'
-                }
+            flight_date = seat.flight.departure_date
+            flight_time = seat.flight.departure_time
+            flight_number = seat.flight.number
+            seat_number = seat.seat_number
+            mail_data = {
+                'email': data.get('email'),
+                'subject': 'Ticket Booking',
+                'content': f'Ticket successfully booked\n date: {flight_date}\n time: {flight_time}\n flight no.: {flight_number}\n seat no.: {seat_number}'
+            }
 
-                send_email(mail_data)
-                return Response({'message': 'Ticket successfully booked. Details have been sent by email'},
-                                status=status.HTTP_200_OK)
-            return Response({'message': pay_resp['data']['message']}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            send_email(mail_data)
+            return Response({'message': 'Ticket successfully booked. Details have been sent by email'},
+                            status=status.HTTP_200_OK)
+        return Response({'message': pay_resp['data']['message']}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):

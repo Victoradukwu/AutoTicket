@@ -6,12 +6,20 @@ from .models import User, Flight, Ticket, Seat
 
 class UserSerializer(serializers.ModelSerializer):
     """UserSerializer class"""
+    confirm_password = serializers.CharField(max_length=200, write_only=True)
+
+    def validate(self, data):
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError("passwords do not match")
+        return data
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'image')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password', 'confirm_password', 'phone_number', 'image')
+        write_only_fields = ('password', 'confirm_password')
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'image': {'required': False}
         }
 
 
@@ -72,14 +80,3 @@ class TicketSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=200)
-
-
-class RegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(max_length=200)
-    confirm_password = serializers.CharField(max_length=200)
-    first_name = serializers.CharField(max_length=200)
-    last_name = serializers.CharField(max_length=200)
-    phone_number = serializers.CharField(max_length=200)
-    image = serializers.ImageField()
-
