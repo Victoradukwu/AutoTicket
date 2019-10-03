@@ -7,6 +7,7 @@ import requests
 from celery import shared_task
 from django.core.mail import send_mail
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.response import Response
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_filters import rest_framework as filters
 from ..models import Ticket, Flight
@@ -127,3 +128,8 @@ class TicketFilter(filters.FilterSet):
     class Meta:
         model = Ticket
         fields = ('passenger', 'booked_by', 'flight_number', 'flight_date')
+
+
+def custom_exception_handler(exc, context):
+
+    return Response({'detail': exc.detail})
