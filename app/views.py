@@ -80,7 +80,7 @@ class LoginView(generics.GenericAPIView):
             }
             payload['data']['isStaff'] = user.is_staff
             return Response(payload, status=status.HTTP_200_OK)
-        return Response({'message': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Wrong password or email'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FlightList(generics.ListCreateAPIView):
@@ -230,7 +230,7 @@ class TicketList(generics.ListCreateAPIView):
             send_email(mail_data)
             return Response({'message': 'Ticket successfully booked. Details have been sent by email'},
                             status=status.HTTP_200_OK)
-        return Response({'message': pay_resp['data']['message']}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': pay_resp['data']['message']}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):

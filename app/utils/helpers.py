@@ -8,6 +8,7 @@ from celery import shared_task
 from django.core.mail import send_mail
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework import status
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_filters import rest_framework as filters
 from ..models import Ticket, Flight
@@ -110,26 +111,26 @@ def start():
 class FlightFilter(filters.FilterSet):
     destination = filters.CharFilter(lookup_expr='icontains')
     departure = filters.CharFilter(lookup_expr='icontains')
-    departure_date = filters.LookupChoiceFilter(field_name='departure_date', lookup_choices=[('exact', 'On'), ('gte', 'After'), ('lte', 'Before')])
+    departureDate = filters.LookupChoiceFilter(field_name='departure_date', lookup_choices=[('exact', 'On'), ('gte', 'After'), ('lte', 'Before')])
 
     class Meta:
         model = Flight
-        fields = ('destination', 'departure', 'departure_date', 'status',)
+        fields = ('destination', 'departure', 'departureDate', 'status',)
 
 
 class TicketFilter(filters.FilterSet):
     passenger = filters.CharFilter(lookup_expr='icontains')
-    booked_by = filters.LookupChoiceFilter(field_name='booked_by__email',
+    bookedBy = filters.LookupChoiceFilter(field_name='booked_by__email',
                                                 lookup_choices=[('iexact', 'Exactly matches'), ('icontains', 'Contains')])
 
-    flight_number = filters.CharFilter(field_name='seat__flight', lookup_expr='number__icontains')
-    flight_date = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_date')
+    flightNumber = filters.CharFilter(field_name='seat__flight', lookup_expr='number__icontains')
+    flightDate = filters.CharFilter(field_name='seat__flight', lookup_expr='departure_date')
 
     class Meta:
         model = Ticket
-        fields = ('passenger', 'booked_by', 'flight_number', 'flight_date')
+        fields = ('passenger', 'bookedBy', 'flightNumber', 'flightDate')
 
 
 def custom_exception_handler(exc, context):
 
-    return Response({'detail': exc.detail})
+    return Response({'detail': exc.detail}, status=status.HTTP_400_BAD_REQUEST)
