@@ -21,6 +21,7 @@ django-heroku==0.3.1
 django-redis==4.10.0
 django-stubs==1.1.0
 djangorestframework==3.9.2
+djangorestframework-camel-case==1.1.1
 djangorestframework-jwt==1.11.0
 djangorestframework-stubs==0.3.0
 drf-yasg==1.15.0
