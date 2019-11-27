@@ -1,5 +1,5 @@
 """A module of app views"""
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.base_user import make_password, check_password
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, renderer_classes
@@ -70,7 +70,10 @@ class LoginView(generics.GenericAPIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
 
-        user = get_object_or_404(User, email=data.get('email'))
+        try:
+            user = User.objects.get(email=data.get('email'))
+        except ObjectDoesNotExist:
+            return Response({'detail': "Wrong password or email"}, status=status.HTTP_400_BAD_REQUEST)
         if check_password(data.get('password'), user.password):
             token = generate_token(user)
             payload = {
