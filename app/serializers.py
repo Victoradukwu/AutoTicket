@@ -54,9 +54,9 @@ class SeatSerializer(serializers.ModelSerializer):
 
         return Seat.objects.create(flight=flight_id, seat_number=validated_data.get('seat_number'))
 
-    extra_kwargs = {
-        'flight_number': {'write_only': True}
-    }
+    # extra_kwargs = {
+    #     'flight_number': {'write_only': True}
+    # }
 
 
 class TicketSerializer(serializers.ModelSerializer):
