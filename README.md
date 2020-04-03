@@ -9,7 +9,8 @@
 https://auto-ticket.herokuapp.com/swagger/
 
 ## Key Application features  
-* User can register abd log in
+* User can register and log in using email and password
+* User can register and log in using Facebook and Google Social Auth
 * User can upload passport photographs
 * User can book tickets
 * User can receive tickets as an email
@@ -18,23 +19,23 @@ https://auto-ticket.herokuapp.com/swagger/
 * User can make online payment using credit/debit card
 
 ## API Endpoints 
-* Register: users/register/
 * Register: POST users/register/
+* Social Auth: POST users/social/<backend>/
 * Log in: POST users/login/
 * List of users: GET: users/
 * List available flights: GET flights/
 * Details of a Flight: GET flights/pk/
-* List available seat objetcs: GET seats/
+* List available seats objects: GET seats/
 * Details of a seat object: GET seat/pk/
 * Make Reservation: POST tickets/reservation/
 * Book ticket: POST tickets/book/
-* Make pyment: 'payment/'
+* Make payment: POST 'payment/'
 
 ## Technologies used
 * Python: A fast growing programming language.
-* Postgres DBMS: An open-source RDBMS for storing data.
+* Postgres DBMS: A RDBMS for storing data.
 * Django web framework: A fullstack Python web application framework.
-* Drango Restframework: A pakage for clean development of RESTful API in django.
+* Drango Restframework: A package for clean development of RESTful API in django.
 
 
 ## Installing the application 
@@ -58,13 +59,25 @@ EMAIL_HOST_USER=you_gmail_account
 EMAIL_HOST_PASSWORD=your_gmail_password
 SECRET_KEY=your_secret_key
 
+SOCIAL_AUTH_FACEBOOK_KEY=your_facebook_app_id
+SOCIAL_AUTH_FACEBOOK_SECRET=your_facebook_app_secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=your_google_oauth2_app_id
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=your_google_oauth2_app_secret
 
 CLOUD_NAME=your_cloudinary_username
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 PAYSTACK_TEST_SECRET_KEY=your_paystack_test_secret_key
 PAYSTACK_TEST_PUBLICK_KEY=your_paystack_test_public_key
+
+DB_NAME=autoticket
+POSTGRES_DB_TEST=autoticket_test
+DB_USER=victor
+DB_PASSWORD=Victor
+
+CORS_WHITELIST=http://localhost:4200,https://autoticket-client.herokuapp.com
 CELERY_BROKER_URL='redis://localhost'
+REDIS_URL=redis://127.0.0.1:6379/1
 ```
 
 * Migrate the application
