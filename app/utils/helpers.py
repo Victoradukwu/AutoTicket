@@ -1,6 +1,9 @@
 """A module of helper functions and classes"""
 import os
+import pdb
 from datetime import datetime, timedelta
+
+from rest_framework.exceptions import NotFound
 from rest_framework_jwt.settings import api_settings
 import cloudinary
 import requests
@@ -133,4 +136,4 @@ class TicketFilter(filters.FilterSet):
 
 def custom_exception_handler(exc, context):
 
-    return Response({'detail': exc.detail}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)

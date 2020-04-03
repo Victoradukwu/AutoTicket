@@ -1,20 +1,24 @@
 """A module of app views"""
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.base_user import make_password, check_password
+from requests.exceptions import HTTPError
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from social_django.utils import psa
+
 from .models import User, Flight, Seat, Ticket
 from .utils.enums import SeatStatus
 from .serializers import (
-    UserSerializer,
     FlightSerializer,
+    LoginSerializer,
     SeatSerializer,
+    SocialSerializer,
     TicketSerializer,
-    LoginSerializer
-
+    UserSerializer
 )
 from .utils.helpers import (
     generate_token,
@@ -292,3 +296,35 @@ class UserList(generics.ListAPIView):
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+@api_view(http_method_names=['POST'])
+@psa()
+def exchange_token(request, backend):
+
+    serializer = SocialSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        try:
+            user = request.backend.do_auth(serializer.validated_data['access_token'])
+        except HTTPError as e:
+            return Response(
+                {'errors': {
+                    'token': 'Invalid token',
+                    'detail': str(e),
+                }},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user:
+            return Response(
+                {'errors': {'non_field_errors': "Authentication Failed"}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if user.is_active:
+            token = generate_token(user)
+            return Response({'token': token})
+        else:
+            return Response(
+                {'errors': {'non_field_errors': 'This user account is inactive'}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

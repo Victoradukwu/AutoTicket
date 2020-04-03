@@ -80,3 +80,13 @@ class TicketSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=200)
+
+
+class SocialSerializer(serializers.Serializer):
+    """
+    This serializer accepts and validates an externally generated OAuth2 access token.
+    """
+    access_token = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+    )
