@@ -1,5 +1,4 @@
 """A module of app views"""
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.base_user import make_password, check_password
 from requests.exceptions import HTTPError
@@ -322,7 +321,13 @@ def exchange_token(request, backend):
             )
         if user.is_active:
             token = generate_token(user)
-            return Response({'token': token})
+            payload = {
+                'message': "Successfully logged in",
+                'token': token,
+                'data': UserSerializer(user).data
+            }
+            payload['data']['isStaff'] = user.is_staff
+            return Response(payload, status=status.HTTP_200_OK)
         else:
             return Response(
                 {'errors': {'non_field_errors': 'This user account is inactive'}},

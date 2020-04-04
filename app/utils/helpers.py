@@ -136,4 +136,5 @@ class TicketFilter(filters.FilterSet):
 
 def custom_exception_handler(exc, context):
 
-    return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    msg = exc.detail if hasattr(exc, 'detail') else str(exc)
+    return Response({'detail': msg}, status=status.HTTP_400_BAD_REQUEST)
