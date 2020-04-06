@@ -8,6 +8,7 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from social_django.utils import psa
+import simplejson as json
 
 from .models import User, Flight, Seat, Ticket
 from .utils.enums import SeatStatus
@@ -206,7 +207,7 @@ class TicketList(generics.ListCreateAPIView):
         flight = Flight.objects.get(number=flight_id)
         payment_data = {
             "email": serializer.validated_data.get('email', request.user.email),
-            "amount": flight.fare,
+            "amount": json.dumps(flight.fare),
             "pin": serializer.validated_data.get('pin'),
             "card": {
                 "number": serializer.validated_data.get('number'),
