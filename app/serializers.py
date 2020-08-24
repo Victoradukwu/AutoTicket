@@ -90,3 +90,14 @@ class SocialSerializer(serializers.Serializer):
         allow_blank=False,
         trim_whitespace=True,
     )
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()
+    confirm_new_password = serializers.CharField()
+
+    def validate(self, data):
+        if data.get('new_password') != data.get('confirm_new_password'):
+            raise serializers.ValidationError("New passwords do not match")
+        return data

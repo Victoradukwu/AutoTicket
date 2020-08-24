@@ -1,6 +1,11 @@
 """A module of custom application models"""
+import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.dispatch import receiver
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail
 
 
 class User(AbstractUser):
@@ -60,3 +65,19 @@ class Ticket(models.Model):
     booked_by = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
+    domain = os.getenv('DOMAIN')
+    email_plain_text_message = f"{domain}/auth/reset-pw?token={reset_password_token.key}"
+    send_mail(
+        # title
+        'Password reset for {title}'.format(title='Some website title'),
+        # Message
+        email_plain_text_message,
+        # from:
+        "noreply@somehost.local",
+        # to:
+        [reset_password_token.user.email]
+    )

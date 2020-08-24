@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'oauth2_provider',
     'social_django',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -188,6 +189,7 @@ AUTH_USER_MODEL = 'app.User'
 # Email setup
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')

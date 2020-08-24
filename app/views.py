@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView
 from social_django.utils import psa
 import simplejson as json
 
@@ -18,7 +19,7 @@ from .serializers import (
     SeatSerializer,
     SocialSerializer,
     TicketSerializer,
-    UserSerializer
+    UserSerializer, PasswordChangeSerializer
 )
 from .utils.helpers import (
     generate_token,
@@ -334,3 +335,21 @@ def exchange_token(request, backend):
                 {'errors': {'non_field_errors': 'This user account is inactive'}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class PasswordChangeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        serializer = PasswordChangeSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        old_password = serializer.validated_data.get('old_password')
+        new_password = serializer.validated_data.get('new_password')
+
+        user = request.user
+        if not user.check_password(old_password):
+            return Response({'detail': 'Wrong password'}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+        return Response({'detail': 'Password successfully changed'}, status=200)

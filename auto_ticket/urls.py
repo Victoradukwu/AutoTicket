@@ -11,8 +11,8 @@ schema_view = get_schema_view(
       title="Autotickets API",
       default_version='v1',
       description="Test description",
-      contact=openapi.Contact(email="victor.adukwu@andela.com"),
-      license=openapi.License(name="BSD License"),
+      contact=openapi.Contact(email='vicads01@gmail.com'),
+      license=openapi.License(name='BSD License'),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
@@ -21,7 +21,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui')
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('users/password-reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ]
 
 urlpatterns += [
