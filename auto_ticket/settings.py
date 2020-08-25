@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -46,7 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -216,4 +217,4 @@ SCHEDULER_AUTOSTART = True
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (os.environ.get('CORS_WHITELIST').split(','))
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_WHITELIST').split(',')
