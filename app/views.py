@@ -19,7 +19,7 @@ from .serializers import (
     SeatSerializer,
     SocialSerializer,
     TicketSerializer,
-    UserSerializer, PasswordChangeSerializer
+    UserSerializer, PasswordChangeSerializer, FlightEditSerializer
 )
 from .utils.helpers import (
     generate_token,
@@ -101,10 +101,22 @@ class FlightList(generics.ListCreateAPIView):
 
         """
 
-    permission_classes = (IsAdminUserOrReadOnly,)
+    # permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     filterset_class = FlightFilter
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        capacity = serializer.validated_data.get('capacity')
+        del serializer.validated_data['capacity']
+        flight = serializer.save()
+
+        for num in range(1, capacity + 1):
+            Seat.objects.create(seat_number=num, status=1, flight=flight)
+        return Response(self.serializer_class(flight).data)
+
 
 
 class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -127,7 +139,7 @@ class FlightDetail(generics.RetrieveUpdateDestroyAPIView):
 
     permission_classes = (IsAdminUserOrReadOnly,)
     queryset = Flight.objects.all()
-    serializer_class = FlightSerializer
+    serializer_class = FlightEditSerializer
 
 
 class SeatList(generics.ListCreateAPIView):

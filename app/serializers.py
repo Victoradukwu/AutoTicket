@@ -26,13 +26,26 @@ class UserSerializer(serializers.ModelSerializer):
 class FlightSerializer(serializers.ModelSerializer):
     """FlightSerializer class"""
     available_seats = serializers.SerializerMethodField()
+    capacity = serializers.IntegerField(write_only=True)
 
     def get_available_seats(self, obj):
         return [seat.seat_number for seat in obj.seats.filter(status=1)]
 
     class Meta:
         model = Flight
-        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'departure_date', 'available_seats')
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'departure_date', 'available_seats', 'capacity')
+
+class FlightEditSerializer(serializers.ModelSerializer):
+    """FlightSerializer class"""
+    available_seats = serializers.SerializerMethodField()
+
+    def get_available_seats(self, obj):
+        return [seat.seat_number for seat in obj.seats.filter(status=1)]
+
+    class Meta:
+        model = Flight
+        fields = ('id', 'departure', 'destination', 'fare', 'status', 'number', 'departure_time', 'departure_date',
+                  'available_seats')
 
 
 class SeatSerializer(serializers.ModelSerializer):
