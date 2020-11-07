@@ -115,7 +115,7 @@ class FlightList(generics.ListCreateAPIView):
 
         for num in range(1, capacity + 1):
             Seat.objects.create(seat_number=num, status=1, flight=flight)
-        return Response(self.serializer_class(flight).data)
+        return Response(self.serializer_class(flight).data, status=201)
 
 
 

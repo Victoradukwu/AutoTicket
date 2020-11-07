@@ -6,7 +6,7 @@ import django_heroku
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'ce*vb^97z^fi8)h3_bcr-b=@c2b!xmq01c&o_bl)prv%=qy!j@'
 
 DEBUG = os.getenv('DEBUG')
 
@@ -216,5 +216,5 @@ SCHEDULER_AUTOSTART = True
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = os.getenv('CORS_WHITELIST').split(',')
+# CORS_ORIGIN_WHITELIST = os.getenv('CORS_WHITELIST').split(',')
+CORS_ALLOW_ALL_ORIGINS = True

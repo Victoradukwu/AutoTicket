@@ -40,10 +40,12 @@ class TestFlightViews(TestCase):
             'departure_date': flt.departure_date,
             'number': flt.number,
             'created_at':flt.created_at,
-            'update_at': flt.updated_at
+            'update_at': flt.updated_at,
+            'capacity': 10
         }
 
         resp = self.client.post(reverse('flight_list'), data)
+        # import pdb; pdb.set_trace()
 
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Flight.objects.first().status, flt.status)

@@ -1,4 +1,3 @@
-[![CircleCI](https://circleci.com/gh/Victoradukwu/AutoTicket.svg?style=svg)](https://circleci.com/gh/Victoradukwu/AutoTicket)
 [![Coverage Status](https://coveralls.io/repos/github/Victoradukwu/AutoTicket/badge.svg?branch=master)](https://coveralls.io/github/Victoradukwu/AutoTicket?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c6ed9c7377e1643b32df/maintainability)](https://codeclimate.com/github/Victoradukwu/AutoTicket/maintainability)
 # AutoTicket

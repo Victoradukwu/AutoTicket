@@ -1,9 +1,11 @@
 version: 2
+orbs:
+  coveralls: coveralls/coveralls@1.0.4
 
 jobs:
   build:
     docker:
-    - image: circleci/python:3.7.1
+    - image: circleci/python@sha256:bf5eb2c51d47321acced9cc9506d8d0b71b2135e3c3b862516b0165d5b4586ef
     - image: circleci/postgres:11.3
     - image: circleci/redis:5.0.1
     
@@ -31,8 +33,8 @@ jobs:
         name: run tests
         command: |
           . venv/bin/activate
-          pip install -r requirements.txt
-          coverage run manage.py test && coverage report
+          sudo pip install -r requirements.txt
+          sudo coverage run manage.py test && coverage report
           COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} coveralls
     - store_artifacts:
         path: test-reports

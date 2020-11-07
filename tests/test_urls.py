@@ -2,10 +2,6 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 from app.views import (
-    user_signin,
-    user_signup,
-    payment,
-    book_ticket,
     FlightList,
     FlightDetail,
     SeatList,
@@ -15,34 +11,6 @@ from app.views import (
 
 class TestUrls(SimpleTestCase):
     """Test class for testing url resolutions"""
-
-    def test_user_signin_url_resolves(self):
-        """Testing the user_signin url"""
-        url = reverse('user_login')
-
-        self.assertEqual(resolve(url).func, user_signin)
-        self.assertEqual(resolve(url).url_name, 'user_login')
-
-    def test_user_signup_url_resolves(self):
-        """Testing the user_signup url"""
-        url = reverse('user_register')
-
-        self.assertEqual(resolve(url).func, user_signup)
-        self.assertEqual(resolve(url).url_name, 'user_register')
-
-    def test_payment_resolves(self):
-        """Testing the payment url"""
-        url = reverse('payment')
-
-        self.assertEqual(resolve(url).func, payment)
-        self.assertEqual(resolve(url).url_name, 'payment')
-
-    def test_book_ticket_resolves(self):
-        """Testing the book_ticket url"""
-        url = reverse('book_ticket')
-
-        self.assertEqual(resolve(url).func, book_ticket)
-        self.assertEqual(resolve(url).url_name, 'book_ticket')
 
     def test_flight_list_url_resolves(self):
         """Testing the flight_list"""
