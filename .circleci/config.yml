@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/python@sha256:bf5eb2c51d47321acced9cc9506d8d0b71b2135e3c3b862516b0165d5b4586ef
+    - image: circleci/python:3.6.4
     - image: circleci/postgres:11.3
     - image: circleci/redis:5.0.1
     
@@ -31,14 +31,9 @@ jobs:
         name: run tests
         command: |
           . venv/bin/activate
-          sudo pip install -r requirements.txt
-          sudo coverage run manage.py test && coverage report
+          pip install -r requirements.txt
+          coverage run manage.py test && coverage report
           COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} coveralls
     - store_artifacts:
         path: test-reports
         destination: test-reports
-workflows:
-  version: 2
-  workflow:
-    jobs:
-    - build

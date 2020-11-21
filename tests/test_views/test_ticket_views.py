@@ -17,22 +17,6 @@ class TestTicketViews(TestCase):
         self.client.force_login(self.auth_user)
 
     @patch('app.views.make_payment')
-    def test_payments(self, mock_make_payment):
-        mock_make_payment.return_value = {'data': {'status': 'success'}}
-        data = urlencode({
-            'email': 'bca@bca.bca',
-            'amount': 1000,
-            'pin': '0000',
-            "number": 'number',
-            "cvv": 222,
-            "expiry_month": 12,
-            "expiry_year":  20
-        })
-
-        # resp = self.client.post(reverse('payment'), data, content_type="application/x-www-form-urlencoded")
-        # self.assertEqual(resp.status_code, 200)
-
-    @patch('app.views.make_payment')
     @patch('app.views.send_email')
     def test_book_ticket(self, mock_send_mail, mock_make_payment):
         mock_make_payment.return_value = {'data': {'status': 'success'}}
