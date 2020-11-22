@@ -28,7 +28,7 @@ class TestUserViews(APITestCase):
             'updated_at': user.updated_at
         }
 
-        resp = self.client.post(reverse('user_register'), data)
+        resp = self.client.post(reverse('user_register'), data, format='json')
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.views.upload_image')
@@ -46,7 +46,7 @@ class TestUserViews(APITestCase):
             'updated_at': user.updated_at
         }
 
-        resp = self.client.post(reverse('user_register'), data)
+        resp = self.client.post(reverse('user_register'), data, format='json')
         self.assertEqual(resp.status_code, 400)
 
     @patch('app.views.upload_image')
