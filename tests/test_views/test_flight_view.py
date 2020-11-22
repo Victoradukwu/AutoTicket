@@ -1,5 +1,5 @@
 """A module of tests for flight views"""
-from model_mommy import mommy
+from model_bakery import baker
 from django.test import TestCase, Client
 from django.urls import reverse
 from app.models import Flight
@@ -10,11 +10,11 @@ class TestFlightViews(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.auth_user = mommy.make('app.User', is_staff=True)
+        self.auth_user = baker.make('app.User', is_staff=True)
         self.client.force_login(self.auth_user)
 
     def test_flight_list_view(self):
-        mommy.make('Flight', _quantity=8)
+        baker.make('Flight', _quantity=8)
 
         resp = self.client.get(reverse('flight_list'))
 
@@ -22,7 +22,7 @@ class TestFlightViews(TestCase):
         self.assertEqual(len(resp.data), 8)
 
     def test_flight_detail_view(self):
-        flt = mommy.make('Flight')
+        flt = baker.make('Flight')
 
         resp = self.client.get(reverse('flight_detail', args=[flt.id]))
 
@@ -30,7 +30,7 @@ class TestFlightViews(TestCase):
         self.assertEquals(resp.data['departure'], flt.departure)
 
     def test_flight_creation_view(self):
-        flt = mommy.prepare('Flight')
+        flt = baker.prepare('Flight')
         data = {
             'departure':  flt.departure,
             'destination': flt.fare,
@@ -45,13 +45,12 @@ class TestFlightViews(TestCase):
         }
 
         resp = self.client.post(reverse('flight_list'), data)
-        # import pdb; pdb.set_trace()
 
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Flight.objects.first().status, flt.status)
 
     def test_flight_delete_view(self):
-        flt = mommy.make('Flight')
+        flt = baker.make('Flight')
 
         resp = self.client.delete(reverse('flight_detail', args=[flt.id]))
         self.assertEqual(resp.status_code, 204)
