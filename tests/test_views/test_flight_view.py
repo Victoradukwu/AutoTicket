@@ -43,7 +43,6 @@ class TestFlightViews(APITestCase):
             'update_at': flt.updated_at,
             'capacity': 10
         }
-
         resp = self.client.post(reverse('flight_list'), data, format='json')
 
         self.assertEqual(resp.status_code, 201)
