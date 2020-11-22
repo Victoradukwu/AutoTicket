@@ -1,15 +1,15 @@
 """A module of tests for flight views"""
 from model_bakery import baker
-from django.test import TestCase, Client
 from django.urls import reverse
+from rest_framework.test import APITestCase
+
 from app.models import Flight
 
 
-class TestFlightViews(TestCase):
+class TestFlightViews(APITestCase):
     """Test class for Flight views"""
 
     def setUp(self):
-        self.client = Client()
         self.auth_user = baker.make('app.User', is_staff=True)
         self.client.force_login(self.auth_user)
 
@@ -43,8 +43,7 @@ class TestFlightViews(TestCase):
             'update_at': flt.updated_at,
             'capacity': 10
         }
-
-        resp = self.client.post(reverse('flight_list'), data)
+        resp = self.client.post(reverse('flight_list'), data, format='json')
 
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Flight.objects.first().status, flt.status)
