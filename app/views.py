@@ -365,3 +365,5 @@ class PasswordChangeView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({'detail': 'Password successfully changed'}, status=200)
+
+
