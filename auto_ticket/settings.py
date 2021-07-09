@@ -14,8 +14,8 @@ ADMINS = [('Victor', 'vicads01@gmail.com'), ('Victorr', 'victor.adukwu@andela.co
 
 MANAGERS = [('Victor', 'vicads01@gmail.com'), ('Victorr', 'victor.adukwu@andela.com')]
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(',')
+CORS_ALLOWED_ORIGINS = os.getenv('DJANGO_CORS_ALLOWED_ORIGINS').split(',')
 
 # Application definition
 
@@ -215,6 +215,4 @@ CACHE_TTL = 30
 SCHEDULER_AUTOSTART = True
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-
-# CORS_ORIGIN_WHITELIST = os.getenv('CORS_WHITELIST').split(',')
-CORS_ALLOW_ALL_ORIGINS = True
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

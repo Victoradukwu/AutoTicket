@@ -16,6 +16,8 @@ venv/*
 .idea/*
 __pycache__
 db.sqlite3
+dump.rdb
+
 
 
 
