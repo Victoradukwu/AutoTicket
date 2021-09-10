@@ -69,7 +69,7 @@ simplejson==3.17.0
 six==1.12.0
 social-auth-app-django==3.1.0
 social-auth-core==3.3.2
-sqlparse==0.4.1
+sqlparse==0.4.2
 typed-ast==1.4.3
 typing-extensions==3.7.4
 tzlocal==1.5.1
